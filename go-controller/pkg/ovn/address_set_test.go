@@ -10,7 +10,7 @@ import (
 	ovntest "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/testing"
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/util"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -24,14 +24,14 @@ func (asn *testAddressSetName) makeName() string {
 	return fmt.Sprintf("%s.%s.%s", asn.namespace, asn.suffix1, asn.suffix2)
 }
 
-var _ = Describe("OVN Address Set operations", func() {
+var _ = ginkgo.Describe("OVN Address Set operations", func() {
 	var (
 		app       *cli.App
 		fexec     *ovntest.FakeExec
 		asFactory AddressSetFactory
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -46,8 +46,8 @@ var _ = Describe("OVN Address Set operations", func() {
 		asFactory = NewOvnAddressSetFactory()
 	})
 
-	Context("when iterating address sets", func() {
-		It("calls the iterator function for each address set with the given prefix", func() {
+	ginkgo.Context("when iterating address sets", func() {
+		ginkgo.It("calls the iterator function for each address set with the given prefix", func() {
 			app.Action = func(ctx *cli.Context) error {
 				_, err := config.InitConfig(ctx, fexec, nil)
 				Expect(err).NotTo(HaveOccurred())
@@ -104,8 +104,8 @@ var _ = Describe("OVN Address Set operations", func() {
 		})
 	})
 
-	Context("when creating an address set object", func() {
-		It("re-uses an existing address set and replaces IPs", func() {
+	ginkgo.Context("when creating an address set object", func() {
+		ginkgo.It("re-uses an existing address set and replaces IPs", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					addr1 string = "1.2.3.4"
@@ -133,7 +133,7 @@ var _ = Describe("OVN Address Set operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("clears an existing address set of IPs", func() {
+		ginkgo.It("clears an existing address set of IPs", func() {
 			app.Action = func(ctx *cli.Context) error {
 				_, err := config.InitConfig(ctx, fexec, nil)
 				Expect(err).NotTo(HaveOccurred())
@@ -156,7 +156,7 @@ var _ = Describe("OVN Address Set operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("creates a new address set and sets IPs", func() {
+		ginkgo.It("creates a new address set and sets IPs", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					addr1 string = "1.2.3.4"
@@ -185,7 +185,7 @@ var _ = Describe("OVN Address Set operations", func() {
 		})
 	})
 
-	It("destroys an address set", func() {
+	ginkgo.It("destroys an address set", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := config.InitConfig(ctx, fexec, nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -212,8 +212,8 @@ var _ = Describe("OVN Address Set operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	Context("when manipulating IPs in an address set object", func() {
-		It("adds an IP to an empty address set", func() {
+	ginkgo.Context("when manipulating IPs in an address set object", func() {
+		ginkgo.It("adds an IP to an empty address set", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const addr1 string = "1.2.3.4"
 
@@ -246,7 +246,7 @@ var _ = Describe("OVN Address Set operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("deletes an IP from an address set", func() {
+		ginkgo.It("deletes an IP from an address set", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const addr1 string = "1.2.3.4"
 
@@ -283,8 +283,8 @@ var _ = Describe("OVN Address Set operations", func() {
 		})
 	})
 
-	Context("Dual stack : when creating an address set object", func() {
-		It("re-uses an existing dual stack address set and replaces IPs", func() {
+	ginkgo.Context("Dual stack : when creating an address set object", func() {
+		ginkgo.It("re-uses an existing dual stack address set and replaces IPs", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					addr1 string = "1.2.3.4"
@@ -324,7 +324,7 @@ var _ = Describe("OVN Address Set operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("clears an existing address set of dual stack IPs", func() {
+		ginkgo.It("clears an existing address set of dual stack IPs", func() {
 			app.Action = func(ctx *cli.Context) error {
 				_, err := config.InitConfig(ctx, fexec, nil)
 				Expect(err).NotTo(HaveOccurred())
@@ -356,7 +356,7 @@ var _ = Describe("OVN Address Set operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("creates a new address set and sets dual stack IPs", func() {
+		ginkgo.It("creates a new address set and sets dual stack IPs", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					addr1 string = "1.2.3.4"
@@ -397,7 +397,7 @@ var _ = Describe("OVN Address Set operations", func() {
 		})
 	})
 
-	It("destroys an dual stack address set", func() {
+	ginkgo.It("destroys an dual stack address set", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := config.InitConfig(ctx, fexec, nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -436,8 +436,8 @@ var _ = Describe("OVN Address Set operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	Context("Dual Stack : when manipulating IPs in an address set object", func() {
-		It("adds  IP to an empty dual stack address set", func() {
+	ginkgo.Context("Dual Stack : when manipulating IPs in an address set object", func() {
+		ginkgo.It("adds  IP to an empty dual stack address set", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const addr1 string = "1.2.3.4"
 				const addr2 string = "2001:db8::1"
@@ -486,7 +486,7 @@ var _ = Describe("OVN Address Set operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("deletes an IP from an dual stack address set", func() {
+		ginkgo.It("deletes an IP from an dual stack address set", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const addr1 string = "1.2.3.4"
 				const addr2 string = "2001:db8::1"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/config"
 	egressipv1 "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/crd/egressip/v1"
@@ -85,7 +85,7 @@ func setupNode(nodeName string, ipNets []string, mockAllocationIPs []string) egr
 	return node
 }
 
-var _ = Describe("OVN master EgressIP Operations", func() {
+var _ = ginkgo.Describe("OVN master EgressIP Operations", func() {
 	var (
 		app     *cli.App
 		fakeOvn *FakeOVN
@@ -123,7 +123,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		}
 	}
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -135,13 +135,13 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		fakeOvn = NewFakeOVN(tExec)
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("On node UPDATE", func() {
+	ginkgo.Context("On node UPDATE", func() {
 
-		It("should re-assign EgressIPs and perform proper OVN transactions when pod is created after node egress label switch", func() {
+		ginkgo.It("should re-assign EgressIPs and perform proper OVN transactions when pod is created after node egress label switch", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := "192.168.126.101"
@@ -260,7 +260,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should re-assign EgressIPs and perform proper OVN transactions when namespace and pod is created after node egress label switch", func() {
+		ginkgo.It("should re-assign EgressIPs and perform proper OVN transactions when namespace and pod is created after node egress label switch", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := "192.168.126.101"
@@ -382,9 +382,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 	})
 
-	Context("IPv6 on pod UPDATE", func() {
+	ginkgo.Context("IPv6 on pod UPDATE", func() {
 
-		It("should remove OVN pod egress setup when EgressIP stops matching pod label", func() {
+		ginkgo.It("should remove OVN pod egress setup when EgressIP stops matching pod label", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := net.ParseIP("0:0:0:0:0:feff:c0a8:8e0d")
@@ -484,7 +484,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not treat pod update if pod already had assigned IP when it got the ADD", func() {
+		ginkgo.It("should not treat pod update if pod already had assigned IP when it got the ADD", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := net.ParseIP("0:0:0:0:0:feff:c0a8:8e0d")
@@ -566,7 +566,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should treat pod update if pod did not have an assigned IP when it got the ADD", func() {
+		ginkgo.It("should treat pod update if pod did not have an assigned IP when it got the ADD", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := net.ParseIP("0:0:0:0:0:feff:c0a8:8e0d")
@@ -645,7 +645,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not treat pod DELETE if pod did not have an assigned IP when it got the ADD and we receive a DELETE before the IP UPDATE", func() {
+		ginkgo.It("should not treat pod DELETE if pod did not have an assigned IP when it got the ADD and we receive a DELETE before the IP UPDATE", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := net.ParseIP("0:0:0:0:0:feff:c0a8:8e0d")
@@ -707,9 +707,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 	})
 
-	Context("IPv6 on namespace UPDATE", func() {
+	ginkgo.Context("IPv6 on namespace UPDATE", func() {
 
-		It("should remove OVN pod egress setup when EgressIP stops matching", func() {
+		ginkgo.It("should remove OVN pod egress setup when EgressIP stops matching", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := net.ParseIP("0:0:0:0:0:feff:c0a8:8e0d")
@@ -808,7 +808,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not remove OVN pod egress setup when EgressIP stops matching, but pod never had any IP to begin with", func() {
+		ginkgo.It("should not remove OVN pod egress setup when EgressIP stops matching, but pod never had any IP to begin with", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := net.ParseIP("0:0:0:0:0:feff:c0a8:8e0d")
@@ -871,9 +871,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 
 	})
-	Context("IPv6 on EgressIP UPDATE", func() {
+	ginkgo.Context("IPv6 on EgressIP UPDATE", func() {
 
-		It("should delete and re-create", func() {
+		ginkgo.It("should delete and re-create", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := net.ParseIP("0:0:0:0:0:feff:c0a8:8e0d")
@@ -998,7 +998,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not do anyting for user defined status updates", func() {
+		ginkgo.It("should not do anyting for user defined status updates", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := net.ParseIP("0:0:0:0:0:feff:c0a8:8e0d")
@@ -1093,9 +1093,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 	})
 
-	Context("WatchEgressNodes", func() {
+	ginkgo.Context("WatchEgressNodes", func() {
 
-		It("should populated egress node data as they are tagged `egress assignable` with variants of IPv4/IPv6", func() {
+		ginkgo.It("should populated egress node data as they are tagged `egress assignable` with variants of IPv4/IPv6", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				node1IPv4 := "192.168.128.202/24"
@@ -1156,7 +1156,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should skip populating egress node data for nodes that have incorrect IP address", func() {
+		ginkgo.It("should skip populating egress node data for nodes that have incorrect IP address", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				nodeIPv4 := "192.168.126.510/24"
@@ -1200,9 +1200,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 
 	})
 
-	Context("WatchEgressNodes running with WatchEgressIP", func() {
+	ginkgo.Context("WatchEgressNodes running with WatchEgressIP", func() {
 
-		It("should treat un-assigned EgressIPs when it is tagged", func() {
+		ginkgo.It("should treat un-assigned EgressIPs when it is tagged", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := "192.168.126.101"
@@ -1284,7 +1284,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should result in error and event if specified egress IP is a cluster node IP", func() {
+		ginkgo.It("should result in error and event if specified egress IP is a cluster node IP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := "192.168.126.51"
@@ -1351,7 +1351,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should re-assigned EgressIPs when more nodes get tagged if the first assignment attempt wasn't fully successful", func() {
+		ginkgo.It("should re-assigned EgressIPs when more nodes get tagged if the first assignment attempt wasn't fully successful", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP1 := "192.168.126.25"
@@ -1433,7 +1433,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should only get assigned EgressIPs which matches their subnet when the node is tagged", func() {
+		ginkgo.It("should only get assigned EgressIPs which matches their subnet when the node is tagged", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := "192.168.126.101"
@@ -1534,7 +1534,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should re-balance EgressIPs when their node is removed", func() {
+		ginkgo.It("should re-balance EgressIPs when their node is removed", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := "192.168.126.101"
@@ -1631,9 +1631,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 
 	})
 
-	Context("Dual-stack assignment", func() {
+	ginkgo.Context("Dual-stack assignment", func() {
 
-		It("should be able to allocate non-conflicting IPv4 on node which can host it, even if it happens to be the node with more assignments", func() {
+		ginkgo.It("should be able to allocate non-conflicting IPv4 on node which can host it, even if it happens to be the node with more assignments", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1666,9 +1666,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 
 	})
 
-	Context("IPv4 assignment", func() {
+	ginkgo.Context("IPv4 assignment", func() {
 
-		It("Should not be able to assign egress IP defined in CIDR notation", func() {
+		ginkgo.It("Should not be able to assign egress IP defined in CIDR notation", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1700,9 +1700,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 	})
 
-	Context("IPv6 assignment", func() {
+	ginkgo.Context("IPv6 assignment", func() {
 
-		It("should be able to allocate non-conflicting IP on node with lowest amount of allocations", func() {
+		ginkgo.It("should be able to allocate non-conflicting IP on node with lowest amount of allocations", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1733,7 +1733,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should be able to allocate several EgressIPs and avoid the same node", func() {
+		ginkgo.It("should be able to allocate several EgressIPs and avoid the same node", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1766,7 +1766,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should be able to allocate several EgressIPs and avoid the same node and leave one un-assigned without error", func() {
+		ginkgo.It("should be able to allocate several EgressIPs and avoid the same node and leave one un-assigned without error", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1802,7 +1802,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not be able to allocate already allocated IP", func() {
+		ginkgo.It("should not be able to allocate already allocated IP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1834,7 +1834,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not be able to allocate node IP", func() {
+		ginkgo.It("should not be able to allocate node IP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1864,7 +1864,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not be able to allocate conflicting compressed IP", func() {
+		ginkgo.It("should not be able to allocate conflicting compressed IP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1897,7 +1897,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not be able to allocate IPv4 IP on nodes which can only host IPv6", func() {
+		ginkgo.It("should not be able to allocate IPv4 IP on nodes which can only host IPv6", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1929,7 +1929,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should be able to allocate non-conflicting compressed uppercase IP", func() {
+		ginkgo.It("should be able to allocate non-conflicting compressed uppercase IP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1960,7 +1960,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not be able to allocate conflicting compressed uppercase IP", func() {
+		ginkgo.It("should not be able to allocate conflicting compressed uppercase IP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -1992,7 +1992,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not be able to allocate invalid IP", func() {
+		ginkgo.It("should not be able to allocate invalid IP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakeOvn.start(ctx)
@@ -2024,9 +2024,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 	})
 
-	Context("WatchEgressIP", func() {
+	ginkgo.Context("WatchEgressIP", func() {
 
-		It("should update status correctly for single-stack IPv4", func() {
+		ginkgo.It("should update status correctly for single-stack IPv4", func() {
 			app.Action = func(ctx *cli.Context) error {
 				fakeOvn.start(ctx)
 
@@ -2069,7 +2069,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should update status correctly for single-stack IPv6", func() {
+		ginkgo.It("should update status correctly for single-stack IPv6", func() {
 			app.Action = func(ctx *cli.Context) error {
 				fakeOvn.start(ctx)
 
@@ -2108,7 +2108,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should update status correctly for dual-stack", func() {
+		ginkgo.It("should update status correctly for dual-stack", func() {
 			app.Action = func(ctx *cli.Context) error {
 				fakeOvn.start(ctx)
 
@@ -2151,9 +2151,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 	})
 
-	Context("syncEgressIP for dual-stack", func() {
+	ginkgo.Context("syncEgressIP for dual-stack", func() {
 
-		It("should not update valid assignments", func() {
+		ginkgo.It("should not update valid assignments", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIPv4 := "192.168.126.101"
@@ -2209,7 +2209,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should update invalid assignments on UNKNOWN node", func() {
+		ginkgo.It("should update invalid assignments on UNKNOWN node", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIPv4 := "192.168.126.101"
@@ -2264,7 +2264,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should update assignment on unsupported IP family node", func() {
+		ginkgo.It("should update assignment on unsupported IP family node", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIPv4 := "192.168.126.101"
@@ -2313,9 +2313,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 	})
 
-	Context("syncEgressIP for IPv4", func() {
+	ginkgo.Context("syncEgressIP for IPv4", func() {
 
-		It("should update invalid assignments on duplicated node", func() {
+		ginkgo.It("should update invalid assignments on duplicated node", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP1 := "192.168.126.101"
@@ -2370,7 +2370,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should update invalid assignments with incorrectly parsed IP", func() {
+		ginkgo.It("should update invalid assignments with incorrectly parsed IP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP1 := "192.168.126.101"
@@ -2419,7 +2419,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should update invalid assignments with unhostable IP on a node", func() {
+		ginkgo.It("should update invalid assignments with unhostable IP on a node", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP1 := "192.168.126.101"
@@ -2468,7 +2468,7 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not update valid assignment", func() {
+		ginkgo.It("should not update valid assignment", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP1 := "192.168.126.101"
@@ -2517,9 +2517,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 		})
 	})
 
-	Context("AddEgressIP for IPv4", func() {
+	ginkgo.Context("AddEgressIP for IPv4", func() {
 
-		It("should not create two EgressIPs with same egress IP value", func() {
+		ginkgo.It("should not create two EgressIPs with same egress IP value", func() {
 			app.Action = func(ctx *cli.Context) error {
 				egressIP1 := "192.168.126.101"
 
@@ -2571,9 +2571,9 @@ var _ = Describe("OVN master EgressIP Operations", func() {
 
 	})
 
-	Context("UpdateEgressIP for IPv4", func() {
+	ginkgo.Context("UpdateEgressIP for IPv4", func() {
 
-		It("should perform re-assingment of EgressIPs", func() {
+		ginkgo.It("should perform re-assingment of EgressIPs", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				egressIP := "192.168.126.101"

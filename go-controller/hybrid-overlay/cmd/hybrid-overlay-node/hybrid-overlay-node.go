@@ -55,7 +55,7 @@ func main() {
 		return nil
 	}
 
-	if err := c.RunContext(ctx, os.Args); err != nil {
+	if err := c.ginkgo.Context(ctx, os.Args); err != nil {
 		klog.Exit(err)
 	}
 }

@@ -31,7 +31,7 @@ import (
 	egressipfake "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/crd/egressip/v1/apis/clientset/versioned/fake"
 	apiextensionsfake "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/fake"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -493,14 +493,14 @@ func expectedIPTablesRules(gatewayIP string) map[string]util.FakeTable {
 	}
 }
 
-var _ = Describe("Gateway Init Operations", func() {
+var _ = ginkgo.Describe("Gateway Init Operations", func() {
 
 	var (
 		testNS ns.NetNS
 		app    *cli.App
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		var err error
 		testNS, err = testutils.NewNS()
 		Expect(err).NotTo(HaveOccurred())
@@ -526,11 +526,11 @@ var _ = Describe("Gateway Init Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		Expect(testNS.Close()).To(Succeed())
 	})
 	/* FIXME for updated local gw mode
-	Context("for localnet operations", func() {
+	ginkgo.Context("for localnet operations", func() {
 		const (
 			v4BrNextHopIP       = "169.254.33.1"
 			v4BrNextHopCIDR     = v4BrNextHopIP + "/24"
@@ -548,7 +548,7 @@ var _ = Describe("Gateway Init Operations", func() {
 			ipTablesRules  []map[string]util.FakeTable
 		)
 
-		It("sets up a IPv4 localnet gateway", func() {
+		ginkgo.It("sets up a IPv4 localnet gateway", func() {
 			nextHopCIDRIPv4, err := netlink.ParseAddr(v4BrNextHopCIDR)
 			Expect(err).NotTo(HaveOccurred())
 			brNextHopCIDRs := append(brNextHopCIDRs, nextHopCIDRIPv4)
@@ -560,7 +560,7 @@ var _ = Describe("Gateway Init Operations", func() {
 			localNetInterfaceTest(app, testNS, ovntest.MustParseIPNets(v4NodeSubnet), brNextHopCIDRs, ipts, ipTablesRules)
 		})
 
-		It("sets up a IPv6 localnet gateway", func() {
+		ginkgo.It("sets up a IPv6 localnet gateway", func() {
 			nextHopCIDRIPv6, err := netlink.ParseAddr(v6BrNextHopCIDR)
 			Expect(err).NotTo(HaveOccurred())
 			brNextHopCIDRs := append(brNextHopCIDRs, nextHopCIDRIPv6)
@@ -572,7 +572,7 @@ var _ = Describe("Gateway Init Operations", func() {
 			localNetInterfaceTest(app, testNS, ovntest.MustParseIPNets(v6NodeSubnet), brNextHopCIDRs, ipts, ipTablesRules)
 		})
 
-		It("sets up a dual stack localnet gateway", func() {
+		ginkgo.It("sets up a dual stack localnet gateway", func() {
 			nextHopCIDRIPv4, err := netlink.ParseAddr(v4BrNextHopCIDR)
 			Expect(err).NotTo(HaveOccurred())
 			brNextHopCIDRs := append(brNextHopCIDRs, nextHopCIDRIPv4)
@@ -592,7 +592,7 @@ var _ = Describe("Gateway Init Operations", func() {
 	})
 	*/
 
-	Context("for NIC-based operations", func() {
+	ginkgo.Context("for NIC-based operations", func() {
 		const (
 			eth0Name string = "eth0"
 			eth0IP   string = "192.168.1.10"
@@ -601,7 +601,7 @@ var _ = Describe("Gateway Init Operations", func() {
 		)
 		var eth0MAC string
 
-		BeforeEach(func() {
+		ginkgo.BeforeEach(func() {
 			// Set up a fake eth0
 			err := testNS.Do(func(ns.NetNS) error {
 				defer GinkgoRecover()
@@ -635,11 +635,11 @@ var _ = Describe("Gateway Init Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("sets up a shared interface gateway", func() {
+		ginkgo.It("sets up a shared interface gateway", func() {
 			shareGatewayInterfaceTest(app, testNS, eth0Name, eth0MAC, eth0IP, eth0GWIP, eth0CIDR, 0)
 		})
 
-		It("sets up a shared interface gateway with tagged VLAN", func() {
+		ginkgo.It("sets up a shared interface gateway with tagged VLAN", func() {
 			shareGatewayInterfaceTest(app, testNS, eth0Name, eth0MAC, eth0IP, eth0GWIP, eth0CIDR, 3000)
 		})
 

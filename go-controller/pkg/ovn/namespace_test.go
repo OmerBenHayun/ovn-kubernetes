@@ -13,7 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -48,7 +48,7 @@ func newNamespace(namespace string) *v1.Namespace {
 	}
 }
 
-var _ = Describe("OVN Namespace Operations", func() {
+var _ = ginkgo.Describe("OVN Namespace Operations", func() {
 	const (
 		namespaceName    = "namespace1"
 		v4AddressSetName = namespaceName + ipv4AddressSetSuffix
@@ -59,7 +59,7 @@ var _ = Describe("OVN Namespace Operations", func() {
 		fakeOvn *FakeOVN
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -70,13 +70,13 @@ var _ = Describe("OVN Namespace Operations", func() {
 		fakeOvn = NewFakeOVN(ovntest.NewFakeExec())
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("on startup", func() {
+	ginkgo.Context("on startup", func() {
 
-		It("reconciles an existing namespace with pods", func() {
+		ginkgo.It("reconciles an existing namespace with pods", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespaceT := *newNamespace(namespaceName)
 				tP := newTPod(
@@ -120,7 +120,7 @@ var _ = Describe("OVN Namespace Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("creates an empty address set for the namespace without pods", func() {
+		ginkgo.It("creates an empty address set for the namespace without pods", func() {
 			app.Action = func(ctx *cli.Context) error {
 				fakeOvn.start(ctx, &v1.NamespaceList{
 					Items: []v1.Namespace{
@@ -143,8 +143,8 @@ var _ = Describe("OVN Namespace Operations", func() {
 		})
 	})
 
-	Context("during execution", func() {
-		It("deletes an empty namespace's resources", func() {
+	ginkgo.Context("during execution", func() {
+		ginkgo.It("deletes an empty namespace's resources", func() {
 			app.Action = func(ctx *cli.Context) error {
 				fakeOvn.start(ctx, &v1.NamespaceList{
 					Items: []v1.Namespace{

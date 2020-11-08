@@ -30,13 +30,13 @@ import (
 
 	egressfirewallfake "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/crd/egressfirewall/v1/apis/clientset/versioned/fake"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var tmpDir string
 
-var _ = AfterSuite(func() {
+var _ = ginkgo.AfterSuite(func() {
 	err := os.RemoveAll(tmpDir)
 	Expect(err).NotTo(HaveOccurred())
 })
@@ -234,7 +234,7 @@ func testManagementPort(ctx *cli.Context, fexec *ovntest.FakeExec, testNS ns.Net
 	Expect(fexec.CalledMatchesExpected()).To(BeTrue(), fexec.ErrorDesc)
 }
 
-var _ = Describe("Management Port Operations", func() {
+var _ = ginkgo.Describe("Management Port Operations", func() {
 	var tmpErr error
 	var app *cli.App
 	var testNS ns.NetNS
@@ -242,10 +242,10 @@ var _ = Describe("Management Port Operations", func() {
 
 	tmpDir, tmpErr = ioutil.TempDir("", "clusternodetest_certdir")
 	if tmpErr != nil {
-		GinkgoT().Errorf("failed to create tempdir: %v", tmpErr)
+		ginkgo.GinkgoT().Errorf("failed to create tempdir: %v", tmpErr)
 	}
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		var err error
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
@@ -267,7 +267,7 @@ var _ = Describe("Management Port Operations", func() {
 		fexec = ovntest.NewFakeExec()
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		Expect(testNS.Close()).To(Succeed())
 	})
 
@@ -288,7 +288,7 @@ var _ = Describe("Management Port Operations", func() {
 		v6lrpMAC string = "0a:58:23:5a:40:f1"
 	)
 
-	It("sets up the management port for IPv4 clusters", func() {
+	ginkgo.It("sets up the management port for IPv4 clusters", func() {
 		app.Action = func(ctx *cli.Context) error {
 			testManagementPort(ctx, fexec, testNS,
 				[]managementPortTestConfig{
@@ -314,7 +314,7 @@ var _ = Describe("Management Port Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("sets up the management port for IPv6 clusters", func() {
+	ginkgo.It("sets up the management port for IPv6 clusters", func() {
 		app.Action = func(ctx *cli.Context) error {
 			testManagementPort(ctx, fexec, testNS,
 				[]managementPortTestConfig{
@@ -340,7 +340,7 @@ var _ = Describe("Management Port Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("sets up the management port for dual-stack clusters", func() {
+	ginkgo.It("sets up the management port for dual-stack clusters", func() {
 		app.Action = func(ctx *cli.Context) error {
 			testManagementPort(ctx, fexec, testNS,
 				[]managementPortTestConfig{

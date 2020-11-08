@@ -16,7 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -133,14 +133,14 @@ func (e endpoints) delCmds(fexec *ovntest.FakeExec, service v1.Service, endpoint
 	}
 }
 
-var _ = Describe("OVN Namespace Operations", func() {
+var _ = ginkgo.Describe("OVN Namespace Operations", func() {
 	var (
 		app     *cli.App
 		fakeOvn *FakeOVN
 		tExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -152,13 +152,13 @@ var _ = Describe("OVN Namespace Operations", func() {
 		fakeOvn = NewFakeOVN(tExec)
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("on startup", func() {
+	ginkgo.Context("on startup", func() {
 
-		It("reconciles existing endpoints", func() {
+		ginkgo.It("reconciles existing endpoints", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -216,7 +216,7 @@ var _ = Describe("OVN Namespace Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles existing endpoints with ExternalIP", func() {
+		ginkgo.It("reconciles existing endpoints with ExternalIP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -278,7 +278,7 @@ var _ = Describe("OVN Namespace Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles existing endpoints with NodePort", func() {
+		ginkgo.It("reconciles existing endpoints with NodePort", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -338,7 +338,7 @@ var _ = Describe("OVN Namespace Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles deleted endpoints", func() {
+		ginkgo.It("reconciles deleted endpoints", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -402,7 +402,7 @@ var _ = Describe("OVN Namespace Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles deleted NodePort endpoints", func() {
+		ginkgo.It("reconciles deleted NodePort endpoints", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}

@@ -13,13 +13,13 @@ import (
 
 	ovntest "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/testing"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 func TestConfig(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Config Suite")
+	RegisterFailHandler(ginkgo.Fail)
+	ginkgo.RunSpecs(t, "Config Suite")
 }
 
 func writeConfigFile(cfgFile *os.File, randomOptData bool, args ...string) error {
@@ -107,7 +107,7 @@ func runInit(app *cli.App, runType int, cfgFile *os.File, args ...string) error 
 
 var tmpDir string
 
-var _ = AfterSuite(func() {
+var _ = ginkgo.AfterSuite(func() {
 	err := os.RemoveAll(tmpDir)
 	Expect(err).NotTo(HaveOccurred())
 })
@@ -194,18 +194,18 @@ cluster-subnets=11.132.0.0/14/23
 	return ioutil.WriteFile(path, []byte(newData), 0644)
 }
 
-var _ = Describe("Config Operations", func() {
+var _ = ginkgo.Describe("Config Operations", func() {
 	var app *cli.App
 	var cfgFile *os.File
 
 	var tmpErr error
 	tmpDir, tmpErr = ioutil.TempDir("", "configtest_certdir")
 	if tmpErr != nil {
-		GinkgoT().Errorf("failed to create tempdir: %v", tmpErr)
+		ginkgo.GinkgoT().Errorf("failed to create tempdir: %v", tmpErr)
 	}
 	tmpDir += "/"
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		PrepareTestConfig()
 
@@ -218,11 +218,11 @@ var _ = Describe("Config Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		os.Remove(cfgFile.Name())
 	})
 
-	It("uses expected defaults", func() {
+	ginkgo.It("uses expected defaults", func() {
 		app.Action = func(ctx *cli.Context) error {
 			cfgPath, err := InitConfigSa(ctx, kexec.New(), tmpDir, nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -261,7 +261,7 @@ var _ = Describe("Config Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("reads defaults from ovs-vsctl external IDs", func() {
+	ginkgo.It("reads defaults from ovs-vsctl external IDs", func() {
 		app.Action = func(ctx *cli.Context) error {
 			fexec := ovntest.NewFakeExec()
 
@@ -323,7 +323,7 @@ var _ = Describe("Config Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("reads defaults (multiple master) from ovs-vsctl external IDs", func() {
+	ginkgo.It("reads defaults (multiple master) from ovs-vsctl external IDs", func() {
 		app.Action = func(ctx *cli.Context) error {
 			fexec := ovntest.NewFakeExec()
 
@@ -390,7 +390,7 @@ var _ = Describe("Config Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("uses serviceaccount files", func() {
+	ginkgo.It("uses serviceaccount files", func() {
 		kubeCAcertFile, err := createTempFile("ca.crt")
 		Expect(err).NotTo(HaveOccurred())
 		defer os.Remove(kubeCAcertFile)
@@ -413,7 +413,7 @@ var _ = Describe("Config Operations", func() {
 
 	})
 
-	It("uses environment variables", func() {
+	ginkgo.It("uses environment variables", func() {
 		kubeconfigEnvFile, err := createTempFile("kubeconfig.env")
 		Expect(err).NotTo(HaveOccurred())
 		defer os.Remove(kubeconfigEnvFile)
@@ -450,7 +450,7 @@ var _ = Describe("Config Operations", func() {
 
 	})
 
-	It("overrides defaults with config file options", func() {
+	ginkgo.It("overrides defaults with config file options", func() {
 		kubeconfigFile, err := createTempFile("kubeconfig")
 		Expect(err).NotTo(HaveOccurred())
 		defer os.Remove(kubeconfigFile)
@@ -514,7 +514,7 @@ var _ = Describe("Config Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("overrides config file and defaults with CLI options", func() {
+	ginkgo.It("overrides config file and defaults with CLI options", func() {
 		kubeconfigFile, err := createTempFile("kubeconfig")
 		Expect(err).NotTo(HaveOccurred())
 		defer os.Remove(kubeconfigFile)
@@ -606,7 +606,7 @@ var _ = Describe("Config Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("overrides config file and defaults with CLI legacy service-cluster-ip-range option", func() {
+	ginkgo.It("overrides config file and defaults with CLI legacy service-cluster-ip-range option", func() {
 		err := ioutil.WriteFile(cfgFile.Name(), []byte(`[kubernetes]
 service-cidrs=172.18.0.0/24
 `), 0644)
@@ -629,7 +629,7 @@ service-cidrs=172.18.0.0/24
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("accepts legacy service-cidr config file option", func() {
+	ginkgo.It("accepts legacy service-cidr config file option", func() {
 		err := ioutil.WriteFile(cfgFile.Name(), []byte(`[kubernetes]
 service-cidr=172.18.0.0/24
 `), 0644)
@@ -651,7 +651,7 @@ service-cidr=172.18.0.0/24
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("returns an error when the k8s-service-cidrs is invalid", func() {
+	ginkgo.It("returns an error when the k8s-service-cidrs is invalid", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("kubernetes service network CIDR \"adsfasdfaf\" invalid: invalid CIDR address: adsfasdfaf"))
@@ -665,7 +665,7 @@ service-cidr=172.18.0.0/24
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("overrides config file and defaults with CLI legacy cluster-subnet option", func() {
+	ginkgo.It("overrides config file and defaults with CLI legacy cluster-subnet option", func() {
 		err := ioutil.WriteFile(cfgFile.Name(), []byte(`[default]
 cluster-subnets=172.18.0.0/23
 `), 0644)
@@ -692,7 +692,7 @@ cluster-subnets=172.18.0.0/23
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("returns an error when the cluster-subnets is invalid", func() {
+	ginkgo.It("returns an error when the cluster-subnets is invalid", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("cluster subnet invalid: CIDR \"adsfasdfaf\" not properly formatted"))
@@ -706,7 +706,7 @@ cluster-subnets=172.18.0.0/23
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("returns an error when the hybrid overlay cluster-subnets is invalid", func() {
+	ginkgo.It("returns an error when the hybrid overlay cluster-subnets is invalid", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("hybrid overlay cluster subnet invalid: CIDR \"adsfasdfaf\" not properly formatted"))
@@ -721,7 +721,7 @@ cluster-subnets=172.18.0.0/23
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("overrides config file and defaults with CLI legacy --init-gateways option", func() {
+	ginkgo.It("overrides config file and defaults with CLI legacy --init-gateways option", func() {
 		err := ioutil.WriteFile(cfgFile.Name(), []byte(`[gateway]
 mode=local
 `), 0644)
@@ -744,7 +744,7 @@ mode=local
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("overrides config file and defaults with CLI legacy --gateway-local option", func() {
+	ginkgo.It("overrides config file and defaults with CLI legacy --gateway-local option", func() {
 		err := ioutil.WriteFile(cfgFile.Name(), []byte(`[gateway]
 mode=shared
 `), 0644)
@@ -768,7 +768,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("returns an error when the gateway mode is invalid", func() {
+	ginkgo.It("returns an error when the gateway mode is invalid", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("invalid gateway mode \"adsfasdfaf\": expect one of shared,local"))
@@ -782,7 +782,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("returns an error when the vlan-id is specified for mode other than shared gateway mode", func() {
+	ginkgo.It("returns an error when the vlan-id is specified for mode other than shared gateway mode", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("gateway VLAN ID option: 30 is supported only in shared gateway mode"))
@@ -797,7 +797,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("overrides config file and defaults with CLI options (multi-master)", func() {
+	ginkgo.It("overrides config file and defaults with CLI options (multi-master)", func() {
 		kubeconfigFile, err := createTempFile("kubeconfig")
 		Expect(err).NotTo(HaveOccurred())
 		defer os.Remove(kubeconfigFile)
@@ -875,7 +875,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("does not override config file settings with default cli options", func() {
+	ginkgo.It("does not override config file settings with default cli options", func() {
 		kubeconfigFile, err := createTempFile("kubeconfig")
 		Expect(err).NotTo(HaveOccurred())
 		defer os.Remove(kubeconfigFile)
@@ -921,7 +921,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("allows configuring a single-stack IPv6 cluster", func() {
+	ginkgo.It("allows configuring a single-stack IPv6 cluster", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -938,7 +938,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("allows configuring a dual-stack cluster", func() {
+	ginkgo.It("allows configuring a dual-stack cluster", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -955,7 +955,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("allows configuring a dual-stack cluster with multiple IPv4 cluster subnet ranges", func() {
+	ginkgo.It("allows configuring a dual-stack cluster with multiple IPv4 cluster subnet ranges", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -972,7 +972,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("rejects a cluster with IPv4 pods and IPv6 services", func() {
+	ginkgo.It("rejects a cluster with IPv4 pods and IPv6 services", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("illegal network configuration: IPv4 cluster subnet, IPv6 service subnet"))
@@ -987,7 +987,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("rejects a cluster with IPv6 pods and IPv4 services", func() {
+	ginkgo.It("rejects a cluster with IPv6 pods and IPv4 services", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("illegal network configuration: IPv6 cluster subnet, IPv4 service subnet"))
@@ -1002,7 +1002,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("rejects a cluster with dual-stack pods and single-stack services", func() {
+	ginkgo.It("rejects a cluster with dual-stack pods and single-stack services", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("illegal network configuration: dual-stack cluster subnet, IPv4 service subnet"))
@@ -1017,7 +1017,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("rejects a cluster with single-stack pods and dual-stack services", func() {
+	ginkgo.It("rejects a cluster with single-stack pods and dual-stack services", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("illegal network configuration: IPv6 cluster subnet, dual-stack service subnet"))
@@ -1032,7 +1032,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("rejects a cluster with multiple single-stack service CIDRs", func() {
+	ginkgo.It("rejects a cluster with multiple single-stack service CIDRs", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("kubernetes service-cidrs must contain either a single CIDR or else an IPv4/IPv6 pair"))
@@ -1047,7 +1047,7 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("rejects a cluster with dual-stack cluster subnets and single-stack hybrid overlap subnets", func() {
+	ginkgo.It("rejects a cluster with dual-stack cluster subnets and single-stack hybrid overlap subnets", func() {
 		app.Action = func(ctx *cli.Context) error {
 			_, err := InitConfig(ctx, kexec.New(), nil)
 			Expect(err).To(MatchError("illegal network configuration: dual-stack cluster subnet, dual-stack service subnet, IPv4 hybrid overlay subnet"))
@@ -1064,10 +1064,10 @@ mode=shared
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	Describe("OvnDBAuth operations", func() {
+	ginkgo.Describe("OvnDBAuth operations", func() {
 		var certFile, keyFile, caFile string
 
-		BeforeEach(func() {
+		ginkgo.BeforeEach(func() {
 			var err error
 			certFile, err = createTempFile("cert.crt")
 			Expect(err).NotTo(HaveOccurred())
@@ -1076,7 +1076,7 @@ mode=shared
 			caFile = filepath.Join(tmpDir, "ca.crt")
 		})
 
-		AfterEach(func() {
+		ginkgo.AfterEach(func() {
 			err := os.Remove(certFile)
 			Expect(err).NotTo(HaveOccurred())
 			err = os.Remove(keyFile)
@@ -1091,7 +1091,7 @@ mode=shared
 			sbDummyCommonName        = "cfg-sbcommonname"
 		)
 
-		It("configures client northbound SSL correctly", func() {
+		ginkgo.It("configures client northbound SSL correctly", func() {
 			fexec := ovntest.NewFakeExec()
 			fexec.AddFakeCmdsNoOutputNoError([]string{
 				"ovn-nbctl --db=" + nbURL + " --timeout=5 --private-key=" + keyFile + " --certificate=" + certFile + " --bootstrap-ca-cert=" + caFile + " list nb_global",
@@ -1122,7 +1122,7 @@ mode=shared
 			Expect(fexec.CalledMatchesExpected()).To(BeTrue(), fexec.ErrorDesc)
 		})
 
-		It("configures client southbound SSL correctly", func() {
+		ginkgo.It("configures client southbound SSL correctly", func() {
 			fexec := ovntest.NewFakeExec()
 			fexec.AddFakeCmdsNoOutputNoError([]string{
 				"ovn-nbctl --db=" + sbURL + " --timeout=5 --private-key=" + keyFile + " --certificate=" + certFile + " --bootstrap-ca-cert=" + caFile + " list nb_global",
@@ -1162,7 +1162,7 @@ mode=shared
 			sbURLConverted string = "tcp:1.2.3.4:6642"
 		)
 
-		It("configures client northbound TCP legacy address correctly", func() {
+		ginkgo.It("configures client northbound TCP legacy address correctly", func() {
 			fexec := ovntest.NewFakeExec()
 			fexec.AddFakeCmdsNoOutputNoError([]string{
 				"ovs-vsctl --timeout=15 set Open_vSwitch . external_ids:ovn-nb=\"" + nbURLConverted + "\"",
@@ -1183,7 +1183,7 @@ mode=shared
 			Expect(fexec.CalledMatchesExpected()).To(BeTrue(), fexec.ErrorDesc)
 		})
 
-		It("configures client southbound TCP legacy address correctly", func() {
+		ginkgo.It("configures client southbound TCP legacy address correctly", func() {
 			fexec := ovntest.NewFakeExec()
 			fexec.AddFakeCmdsNoOutputNoError([]string{
 				"ovs-vsctl --timeout=15 set Open_vSwitch . external_ids:ovn-nb=\"" + nbURLConverted + "\"",
@@ -1207,7 +1207,7 @@ mode=shared
 
 	// This testcase factory function exists only to ensure that 'runType'
 	// and 'dir' are evaluated when this factory function is called (and
-	// the It() is created), but that the CLI arguments are evaluated only
+	// the ginkgo.It() is created), but that the CLI arguments are evaluated only
 	// when the test function is actually executed.
 	createOneTest := func(runType int, dir, match string, getArgs func() []string) func() {
 		return func() {
@@ -1230,29 +1230,29 @@ mode=shared
 		}
 	}
 
-	// Generates multiple runType and direction It() tests for a given description, match, and args
+	// Generates multiple runType and direction ginkgo.It() tests for a given description, match, and args
 	generateTests := func(desc, match string, getArgs func() []string) {
 		for _, dir := range []string{"nb", "sb"} {
 			for runType := 1; runType <= 3; runType++ {
 				realDesc := fmt.Sprintf("(%d/%s) %s", runType, dir, desc)
-				It(realDesc, createOneTest(runType, dir, match, getArgs))
+				ginkgo.It(realDesc, createOneTest(runType, dir, match, getArgs))
 			}
 		}
 	}
 
-	// Generates multiple runType It() tests for a given description, match, and args
+	// Generates multiple runType ginkgo.It() tests for a given description, match, and args
 	generateTestsSimple := func(desc, match string, args ...string) {
 		for runType := 1; runType <= 3; runType++ {
 			realDesc := fmt.Sprintf("(%d) %s", runType, desc)
-			It(realDesc, createOneTest(runType, "", match, func() []string {
+			ginkgo.It(realDesc, createOneTest(runType, "", match, func() []string {
 				return args
 			}))
 		}
 	}
 
 	// Run once without config file, once with
-	Describe("Kubernetes config options", func() {
-		Context("returns an error when the", func() {
+	ginkgo.Describe("Kubernetes config options", func() {
+		ginkgo.Context("returns an error when the", func() {
 			generateTestsSimple("CA cert does not exist",
 				"kubernetes CA certificate file \"/foo/bar/baz.cert\" not found",
 				"-k8s-apiserver=https://localhost:8443", "-k8s-cacert=/foo/bar/baz.cert")
@@ -1271,10 +1271,10 @@ mode=shared
 		})
 	})
 
-	Describe("OVN API config options", func() {
+	ginkgo.Describe("OVN API config options", func() {
 		var certFile, keyFile, caFile string
 
-		BeforeEach(func() {
+		ginkgo.BeforeEach(func() {
 			var err error
 			certFile, err = createTempFile("cert.crt")
 			Expect(err).NotTo(HaveOccurred())
@@ -1284,13 +1284,13 @@ mode=shared
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		AfterEach(func() {
+		ginkgo.AfterEach(func() {
 			os.Remove(certFile)
 			os.Remove(keyFile)
 			os.Remove(caFile)
 		})
 
-		Context("returns an error when", func() {
+		ginkgo.Context("returns an error when", func() {
 			generateTests("the scheme is not empty/tcp/ssl",
 				"unknown OVN DB scheme \"blah\"",
 				func() []string {
@@ -1325,7 +1325,7 @@ mode=shared
 				})
 		})
 
-		Context("does not return an error when", func() {
+		ginkgo.Context("does not return an error when", func() {
 			generateTests("the SSL scheme is missing a client CA cert", "",
 				func() []string {
 					return []string{

@@ -6,7 +6,7 @@ import (
 
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/config"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v2"
 	kapi "k8s.io/api/core/v1"
@@ -92,13 +92,13 @@ func newLocalPort(desc string, ip string, port int32, protocol kapi.Protocol) (*
 	return localPort, portError
 }
 
-var _ = Describe("Node Operations", func() {
+var _ = ginkgo.Describe("Node Operations", func() {
 
 	var (
 		app *cli.App
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -107,9 +107,9 @@ var _ = Describe("Node Operations", func() {
 		app.Flags = config.Flags
 
 	})
-	Context("on add service", func() {
+	ginkgo.Context("on add service", func() {
 
-		It("should open a port for ExternalIP", func() {
+		ginkgo.It("should open a port for ExternalIP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakePort := &fakePortManager{
@@ -144,7 +144,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should open a NodePort", func() {
+		ginkgo.It("should open a NodePort", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakePort := &fakePortManager{
@@ -179,7 +179,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should open a NodePort and port for ExternalIP", func() {
+		ginkgo.It("should open a NodePort and port for ExternalIP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakePort := &fakePortManager{
@@ -216,7 +216,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should open per protocol NodePorts and ExternalIPs ports", func() {
+		ginkgo.It("should open per protocol NodePorts and ExternalIPs ports", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakePort := &fakePortManager{
@@ -253,7 +253,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should not open a port for ClusterIP", func() {
+		ginkgo.It("should not open a port for ClusterIP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakePort := &fakePortManager{}
@@ -284,9 +284,9 @@ var _ = Describe("Node Operations", func() {
 		})
 	})
 
-	Context("on delete service", func() {
+	ginkgo.Context("on delete service", func() {
 
-		It("should not do anything ports for ClusterIP updates", func() {
+		ginkgo.It("should not do anything ports for ClusterIP updates", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				fakePort := &fakePortManager{
@@ -333,7 +333,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should only remove ports when ExternalIP -> no ExternalIP", func() {
+		ginkgo.It("should only remove ports when ExternalIP -> no ExternalIP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				oldService := newService("service8", "namespace1", "10.129.0.2",
@@ -390,9 +390,9 @@ var _ = Describe("Node Operations", func() {
 
 	})
 
-	Context("on delete service", func() {
+	ginkgo.Context("on delete service", func() {
 
-		It("should close ports for ExternalIP", func() {
+		ginkgo.It("should close ports for ExternalIP", func() {
 			app.Action = func(ctx *cli.Context) error {
 				service := newService("service10", "namespace1", "10.129.0.2",
 					[]kapi.ServicePort{
@@ -433,7 +433,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should close a NodePort and port for ExternalIP", func() {
+		ginkgo.It("should close a NodePort and port for ExternalIP", func() {
 			app.Action = func(ctx *cli.Context) error {
 				service := newService("service11", "namespace1", "10.129.0.2",
 					[]kapi.ServicePort{
@@ -478,7 +478,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should close per protocol for NodePort and ExternalIP ports", func() {
+		ginkgo.It("should close per protocol for NodePort and ExternalIP ports", func() {
 			app.Action = func(ctx *cli.Context) error {
 				service := newService("service12", "namespace1", "10.129.0.2",
 					[]kapi.ServicePort{
@@ -522,7 +522,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should close ports for NodePort", func() {
+		ginkgo.It("should close ports for NodePort", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				service := newService("service13", "namespace1", "10.129.0.2",
@@ -561,8 +561,8 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
-	Context("open/close check operations", func() {
-		It("should open and close ports", func() {
+	ginkgo.Context("open/close check operations", func() {
+		ginkgo.It("should open and close ports", func() {
 			app.Action = func(ctx *cli.Context) error {
 				localAddrSet, err := getLocalAddrs()
 				Expect(err).ShouldNot(HaveOccurred())

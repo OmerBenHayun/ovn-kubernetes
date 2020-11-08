@@ -39,7 +39,7 @@ func (_m *Interface) Command(cmd string, args ...string) exec.Cmd {
 }
 
 // CommandContext provides a mock function with given fields: ctx, cmd, args
-func (_m *Interface) CommandContext(ctx context.Context, cmd string, args ...string) exec.Cmd {
+func (_m *Interface) Command.Context(ctx context.Context, cmd string, args ...string) exec.Cmd {
 	_va := make([]interface{}, len(args))
 	for _i := range args {
 		_va[_i] = args[_i]

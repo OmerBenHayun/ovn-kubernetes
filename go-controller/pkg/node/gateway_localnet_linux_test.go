@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/config"
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/factory"
@@ -103,7 +103,7 @@ func newService(name, namespace, ip string, ports []v1.ServicePort, serviceType 
 	}
 }
 
-var _ = Describe("Node Operations", func() {
+var _ = ginkgo.Describe("Node Operations", func() {
 
 	var (
 		app         *cli.App
@@ -111,7 +111,7 @@ var _ = Describe("Node Operations", func() {
 		fExec       *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -123,9 +123,9 @@ var _ = Describe("Node Operations", func() {
 		fakeOvnNode = NewFakeOVNNode(fExec)
 	})
 
-	Context("on startup", func() {
+	ginkgo.Context("on startup", func() {
 
-		It("inits physical routing rules", func() {
+		ginkgo.It("inits physical routing rules", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				iptV4, iptV6 := util.SetFakeIPTablesHelpers()
@@ -186,7 +186,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("removes stale physical routing rules while keeping remaining intact", func() {
+		ginkgo.It("removes stale physical routing rules while keeping remaining intact", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "1.1.1.1"
@@ -306,9 +306,9 @@ var _ = Describe("Node Operations", func() {
 		})
 	})
 
-	Context("on add", func() {
+	ginkgo.Context("on add", func() {
 
-		It("inits physical routing rules with ExternalIP outside any local network", func() {
+		ginkgo.It("inits physical routing rules with ExternalIP outside any local network", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "1.1.1.1"
@@ -352,7 +352,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("does nothing when ExternalIP on shared network", func() {
+		ginkgo.It("does nothing when ExternalIP on shared network", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "10.10.10.2"
@@ -392,7 +392,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("inits iptables rules when ExternalIP attached to network interface", func() {
+		ginkgo.It("inits iptables rules when ExternalIP attached to network interface", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "10.10.10.1"
@@ -436,7 +436,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("inits iptables rules with NodePort", func() {
+		ginkgo.It("inits iptables rules with NodePort", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				nodePort := int32(31111)
@@ -480,7 +480,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("emits event when ExternalIP attached to network interface with headless service", func() {
+		ginkgo.It("emits event when ExternalIP attached to network interface with headless service", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "10.10.10.1"
@@ -526,9 +526,9 @@ var _ = Describe("Node Operations", func() {
 		})
 	})
 
-	Context("on delete", func() {
+	ginkgo.Context("on delete", func() {
 
-		It("deletes physical routing rules with ExternalIP outside any local network", func() {
+		ginkgo.It("deletes physical routing rules with ExternalIP outside any local network", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "1.1.1.1"
@@ -572,7 +572,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("does nothing when ExternalIP on shared network", func() {
+		ginkgo.It("does nothing when ExternalIP on shared network", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "10.10.10.2"
@@ -612,7 +612,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("deletes iptables rules with ExternalIP attached to network interface", func() {
+		ginkgo.It("deletes iptables rules with ExternalIP attached to network interface", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "10.10.10.1"
@@ -652,7 +652,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("deletes iptables rules for NodePort", func() {
+		ginkgo.It("deletes iptables rules for NodePort", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				nodePort := int32(31111)
@@ -693,9 +693,9 @@ var _ = Describe("Node Operations", func() {
 		})
 	})
 
-	Context("on add and delete", func() {
+	ginkgo.Context("on add and delete", func() {
 
-		It("manages iptables rules with ExternalIP attached to network interface", func() {
+		ginkgo.It("manages iptables rules with ExternalIP attached to network interface", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				externalIP := "10.10.10.1"
@@ -755,7 +755,7 @@ var _ = Describe("Node Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("manages iptables rules for NodePort", func() {
+		ginkgo.It("manages iptables rules for NodePort", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				nodePort := int32(38034)

@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/config"
@@ -286,7 +286,7 @@ func (p multicastPolicy) delPodCmds(fExec *ovntest.FakeExec, ns string) {
 	})
 }
 
-var _ = Describe("OVN NetworkPolicy Operations", func() {
+var _ = ginkgo.Describe("OVN NetworkPolicy Operations", func() {
 	const (
 		namespaceName1    = "namespace1"
 		v4AddressSetName1 = namespaceName1 + ipv4AddressSetSuffix
@@ -302,7 +302,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 		fExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -314,13 +314,13 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 		fakeOvn = NewFakeOVN(fExec)
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("on startup", func() {
+	ginkgo.Context("on startup", func() {
 
-		It("reconciles an existing ingress networkPolicy with a namespace selector", func() {
+		ginkgo.It("reconciles an existing ingress networkPolicy with a namespace selector", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -393,7 +393,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles an existing gress networkPolicy with a pod selector in its own namespace", func() {
+		ginkgo.It("reconciles an existing gress networkPolicy with a pod selector in its own namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -480,7 +480,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles an existing gress networkPolicy with a pod and namespace selector in another namespace", func() {
+		ginkgo.It("reconciles an existing gress networkPolicy with a pod and namespace selector in another namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -582,9 +582,9 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 		})
 	})
 
-	Context("during execution", func() {
+	ginkgo.Context("during execution", func() {
 
-		It("correctly creates a networkpolicy allowing a port to a local pod", func() {
+		ginkgo.It("correctly creates a networkpolicy allowing a port to a local pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 				npTest := networkPolicy{}
 
@@ -670,7 +670,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a deleted namespace referenced by a networkpolicy with a local running pod", func() {
+		ginkgo.It("reconciles a deleted namespace referenced by a networkpolicy with a local running pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -775,7 +775,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a deleted namespace referenced by a networkpolicy", func() {
+		ginkgo.It("reconciles a deleted namespace referenced by a networkpolicy", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -857,7 +857,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a deleted pod referenced by a networkpolicy in its own namespace", func() {
+		ginkgo.It("reconciles a deleted pod referenced by a networkpolicy in its own namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -952,7 +952,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a deleted pod referenced by a networkpolicy in another namespace", func() {
+		ginkgo.It("reconciles a deleted pod referenced by a networkpolicy in another namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -1060,7 +1060,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a deleted networkpolicy", func() {
+		ginkgo.It("reconciles a deleted networkpolicy", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -1152,7 +1152,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("tests enabling/disabling multicast in a namespace", func() {
+		ginkgo.It("tests enabling/disabling multicast in a namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespace1 := *newNamespace(namespaceName1)
 
@@ -1195,7 +1195,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("tests enabling multicast in a namespace with a pod", func() {
+		ginkgo.It("tests enabling multicast in a namespace with a pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespace1 := *newNamespace(namespaceName1)
 
@@ -1249,7 +1249,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("tests adding a pod to a multicast enabled namespace", func() {
+		ginkgo.It("tests adding a pod to a multicast enabled namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespace1 := *newNamespace(namespaceName1)
 
@@ -1353,13 +1353,13 @@ func addExpectedGressCmds(fExec *ovntest.FakeExec, gp *gressPolicy, pgName strin
 	return newAS
 }
 
-var _ = Describe("OVN NetworkPolicy Low-Level Operations", func() {
+var _ = ginkgo.Describe("OVN NetworkPolicy Low-Level Operations", func() {
 	var (
 		fExec     *ovntest.FakeExec
 		asFactory *fakeAddressSetFactory
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 		fExec = ovntest.NewLooseCompareFakeExec()
@@ -1371,7 +1371,7 @@ var _ = Describe("OVN NetworkPolicy Low-Level Operations", func() {
 		config.IPv6Mode = false
 	})
 
-	It("computes match strings from address sets correctly", func() {
+	ginkgo.It("computes match strings from address sets correctly", func() {
 		const (
 			pgUUID string = "pg-uuid"
 			pgName string = "pg-name"

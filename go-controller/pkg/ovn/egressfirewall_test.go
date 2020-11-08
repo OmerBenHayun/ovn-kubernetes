@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/config"
@@ -37,14 +37,14 @@ func newEgressFirewallObject(name, namespace string, egressRules []egressfirewal
 	}
 }
 
-var _ = Describe("OVN EgressFirewall Operations", func() {
+var _ = ginkgo.Describe("OVN EgressFirewall Operations", func() {
 	var (
 		app     *cli.App
 		fakeOVN *FakeOVN
 		fExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -57,12 +57,12 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOVN.shutdown()
 	})
 
-	Context("on startup", func() {
-		It("reconciles an existing egressFirewall", func() {
+	ginkgo.Context("on startup", func() {
+		ginkgo.It("reconciles an existing egressFirewall", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					node1Name string = "node1"
@@ -119,8 +119,8 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 
 		})
 	})
-	Context("during execution", func() {
-		It("correctly creates an egressfirewall denying traffic all udp traffic", func() {
+	ginkgo.Context("during execution", func() {
+		ginkgo.It("correctly creates an egressfirewall denying traffic all udp traffic", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					node1Name string = "node1"
@@ -177,7 +177,7 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 			err := app.Run([]string{app.Name})
 			Expect(err).NotTo(HaveOccurred())
 		})
-		It("correctly deletes an egressfirewall", func() {
+		ginkgo.It("correctly deletes an egressfirewall", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					node1Name string = "node1"
@@ -247,7 +247,7 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 			err := app.Run([]string{app.Name})
 			Expect(err).NotTo(HaveOccurred())
 		})
-		It("correctly updates an egressfirewall", func() {
+		ginkgo.It("correctly updates an egressfirewall", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					node1Name string = "node1"
@@ -324,9 +324,9 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 
 })
 
-var _ = Describe("OVN test basic functions", func() {
+var _ = ginkgo.Describe("OVN test basic functions", func() {
 
-	It("computes correct L4Match", func() {
+	ginkgo.It("computes correct L4Match", func() {
 		type testcase struct {
 			ports         []egressfirewallapi.EgressFirewallPort
 			expectedMatch string

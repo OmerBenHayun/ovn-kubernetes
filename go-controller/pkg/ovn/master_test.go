@@ -25,7 +25,7 @@ import (
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/types"
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/util"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -276,7 +276,7 @@ func populatePortAddresses(nodeName, lsp, mac, ips string, ovnClient goovn.Clien
 }
 
 /* FIXME for updated local gw
-var _ = Describe("Master Operations", func() {
+var _ = ginkgo.Describe("Master Operations", func() {
 	var (
 		app      *cli.App
 		f        *factory.WatchFactory
@@ -284,7 +284,7 @@ var _ = Describe("Master Operations", func() {
 		wg       *sync.WaitGroup
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -295,13 +295,13 @@ var _ = Describe("Master Operations", func() {
 		wg = &sync.WaitGroup{}
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		close(stopChan)
 		f.Shutdown()
 		wg.Wait()
 	})
 
-	It("creates logical network elements for a 2-node cluster", func() {
+	ginkgo.It("creates logical network elements for a 2-node cluster", func() {
 		const (
 			clusterIPNet string = "10.1.0.0"
 			clusterCIDR  string = clusterIPNet + "/16"
@@ -405,7 +405,7 @@ var _ = Describe("Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("works without SCTP support", func() {
+	ginkgo.It("works without SCTP support", func() {
 		const (
 			clusterIPNet string = "10.1.0.0"
 			clusterCIDR  string = clusterIPNet + "/16"
@@ -508,7 +508,7 @@ var _ = Describe("Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("does not allocate a hostsubnet for a node that already has one", func() {
+	ginkgo.It("does not allocate a hostsubnet for a node that already has one", func() {
 		const (
 			clusterIPNet string = "10.1.0.0"
 			clusterCIDR  string = clusterIPNet + "/16"
@@ -609,7 +609,7 @@ var _ = Describe("Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("removes deleted nodes from the OVN database", func() {
+	ginkgo.It("removes deleted nodes from the OVN database", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				tcpLBUUID         string = "1a3dfc82-2749-4931-9190-c30e7c0ecea3"
@@ -775,7 +775,7 @@ func addPBRandNATRules(fexec *ovntest.FakeExec, nodeName, nodeSubnet, nodeIP, mg
 	})
 }
 
-var _ = Describe("Gateway Init Operations", func() {
+var _ = ginkgo.Describe("Gateway Init Operations", func() {
 	var (
 		app      *cli.App
 		f        *factory.WatchFactory
@@ -787,7 +787,7 @@ var _ = Describe("Gateway Init Operations", func() {
 		clusterCIDR  string = clusterIPNet + "/16"
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -797,13 +797,13 @@ var _ = Describe("Gateway Init Operations", func() {
 		stopChan = make(chan struct{})
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		close(stopChan)
 		f.Shutdown()
 	})
 
 	/* FIXME with update to local gw
-	It("sets up a localnet gateway", func() {
+	ginkgo.It("sets up a localnet gateway", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				nodeName               string = "node1"
@@ -999,7 +999,7 @@ var _ = Describe("Gateway Init Operations", func() {
 	})
 	*/
 
-	It("sets up a shared gateway", func() {
+	ginkgo.It("sets up a shared gateway", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				nodeName             string = "node1"

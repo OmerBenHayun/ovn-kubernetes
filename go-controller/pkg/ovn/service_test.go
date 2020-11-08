@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/config"
@@ -151,14 +151,14 @@ func (s service) delCmds(fexec *ovntest.FakeExec, service v1.Service) {
 	}
 }
 
-var _ = Describe("OVN Namespace Operations", func() {
+var _ = ginkgo.Describe("OVN Namespace Operations", func() {
 	var (
 		app     *cli.App
 		fakeOvn *FakeOVN
 		fExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -170,13 +170,13 @@ var _ = Describe("OVN Namespace Operations", func() {
 		fakeOvn = NewFakeOVN(fExec)
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("on startup", func() {
+	ginkgo.Context("on startup", func() {
 
-		It("reconciles an existing service", func() {
+		ginkgo.It("reconciles an existing service", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				test := service{}
@@ -215,7 +215,7 @@ var _ = Describe("OVN Namespace Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a deleted service", func() {
+		ginkgo.It("reconciles a deleted service", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				test := service{}

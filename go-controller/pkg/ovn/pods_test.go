@@ -21,7 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -168,14 +168,14 @@ func (p pod) addCmdsForNonExistingPod(fexec *ovntest.FakeExec) {
 	p.addCmds(fexec, false)
 }
 
-var _ = Describe("OVN Pod Operations", func() {
+var _ = ginkgo.Describe("OVN Pod Operations", func() {
 	var (
 		app     *cli.App
 		fakeOvn *FakeOVN
 		fExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -187,13 +187,13 @@ var _ = Describe("OVN Pod Operations", func() {
 		fakeOvn = NewFakeOVN(fExec)
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("during execution", func() {
+	ginkgo.Context("during execution", func() {
 
-		It("reconciles an existing pod", func() {
+		ginkgo.It("reconciles an existing pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -254,7 +254,7 @@ var _ = Describe("OVN Pod Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a new pod", func() {
+		ginkgo.It("reconciles a new pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespaceT := *newNamespace("namespace1")
 				t := newTPod(
@@ -301,7 +301,7 @@ var _ = Describe("OVN Pod Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a deleted pod", func() {
+		ginkgo.It("reconciles a deleted pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -356,7 +356,7 @@ var _ = Describe("OVN Pod Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("retries a failed pod Add on Update", func() {
+		ginkgo.It("retries a failed pod Add on Update", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -423,7 +423,7 @@ var _ = Describe("OVN Pod Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("retries a failed pod Add when namespace doesn't yet exist", func() {
+		ginkgo.It("retries a failed pod Add when namespace doesn't yet exist", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := newNamespace("namespace1")
@@ -479,9 +479,9 @@ var _ = Describe("OVN Pod Operations", func() {
 		})
 	})
 
-	Context("on startup", func() {
+	ginkgo.Context("on startup", func() {
 
-		It("reconciles an existing pod", func() {
+		ginkgo.It("reconciles an existing pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -536,7 +536,7 @@ var _ = Describe("OVN Pod Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a deleted pod", func() {
+		ginkgo.It("reconciles a deleted pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -570,7 +570,7 @@ var _ = Describe("OVN Pod Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a new pod", func() {
+		ginkgo.It("reconciles a new pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -616,9 +616,9 @@ var _ = Describe("OVN Pod Operations", func() {
 		})
 	})
 
-	Context("on ovn restart", func() {
+	ginkgo.Context("on ovn restart", func() {
 
-		It("reconciles an existing pod without an existing logical switch port", func() {
+		ginkgo.It("reconciles an existing pod without an existing logical switch port", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -678,7 +678,7 @@ var _ = Describe("OVN Pod Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles an existing pod with an existing logical switch port", func() {
+		ginkgo.It("reconciles an existing pod with an existing logical switch port", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -740,8 +740,8 @@ var _ = Describe("OVN Pod Operations", func() {
 		})
 	})
 
-	Context("with hybrid overlay gw mode", func() {
-		It("resets the hybrid annotations on update", func() {
+	ginkgo.Context("with hybrid overlay gw mode", func() {
+		ginkgo.It("resets the hybrid annotations on update", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespaceT := *newNamespace("namespace1")
 				namespaceT.Annotations[hotypes.HybridOverlayVTEP] = "1.1.1.1"

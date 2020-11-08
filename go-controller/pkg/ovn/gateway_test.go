@@ -8,19 +8,19 @@ import (
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/types"
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/util"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Gateway Init Operations", func() {
-	BeforeEach(func() {
+var _ = ginkgo.Describe("Gateway Init Operations", func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 		// TODO make contexts here for shared gw mode and local gw mode, right now this only tests shared gw
 		config.Gateway.Mode = config.GatewayModeShared
 	})
 
-	It("correctly sorts gateway routers", func() {
+	ginkgo.It("correctly sorts gateway routers", func() {
 		fexec := ovntest.NewFakeExec()
 		fexec.AddFakeCmd(&ovntest.ExpectedCmd{
 			Cmd: "ovn-nbctl --timeout=15 --data=bare --format=table --no-heading --columns=name,options find logical_router options:lb_force_snat_ip!=-",
@@ -34,7 +34,7 @@ node4 chassis=912d592c-904c-40cd-9ef1-c2e5b49a33dd lb_force_snat_ip=100.64.0.4`,
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("ignores malformatted gateway router entires", func() {
+	ginkgo.It("ignores malformatted gateway router entires", func() {
 		fexec := ovntest.NewFakeExec()
 		fexec.AddFakeCmd(&ovntest.ExpectedCmd{
 			Cmd: "ovn-nbctl --timeout=15 --data=bare --format=table --no-heading --columns=name,options find logical_router options:lb_force_snat_ip!=-",
@@ -48,7 +48,7 @@ node4 chassis=912d592c-904c-40cd-9ef1-c2e5b49a33dd lb_force_snat_ip=100.64.0.4`,
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("creates an IPv4 gateway in OVN", func() {
+	ginkgo.It("creates an IPv4 gateway in OVN", func() {
 		clusterIPSubnets := ovntest.MustParseIPNets("10.128.0.0/14")
 		hostSubnets := ovntest.MustParseIPNets("10.130.0.0/23")
 		joinLRPIPs := ovntest.MustParseIPNets("100.64.0.3/16")
@@ -118,7 +118,7 @@ node4 chassis=912d592c-904c-40cd-9ef1-c2e5b49a33dd lb_force_snat_ip=100.64.0.4`,
 		Expect(fexec.CalledMatchesExpected()).To(BeTrue())
 	})
 
-	It("creates an IPv6 gateway in OVN", func() {
+	ginkgo.It("creates an IPv6 gateway in OVN", func() {
 		clusterIPSubnets := ovntest.MustParseIPNets("fd01::/48")
 		hostSubnets := ovntest.MustParseIPNets("fd01:0:0:2::/64")
 		joinLRPIPs := ovntest.MustParseIPNets("fd98::3/64")
@@ -190,7 +190,7 @@ node4 chassis=912d592c-904c-40cd-9ef1-c2e5b49a33dd lb_force_snat_ip=100.64.0.4`,
 		Expect(fexec.CalledMatchesExpected()).To(BeTrue())
 	})
 
-	It("creates a dual-stack gateway in OVN", func() {
+	ginkgo.It("creates a dual-stack gateway in OVN", func() {
 		clusterIPSubnets := ovntest.MustParseIPNets("10.128.0.0/14", "fd01::/48")
 		hostSubnets := ovntest.MustParseIPNets("10.130.0.0/23", "fd01:0:0:2::/64")
 		joinLRPIPs := ovntest.MustParseIPNets("100.64.0.3/16", "fd98::3/64")
@@ -265,7 +265,7 @@ node4 chassis=912d592c-904c-40cd-9ef1-c2e5b49a33dd lb_force_snat_ip=100.64.0.4`,
 		Expect(fexec.CalledMatchesExpected()).To(BeTrue())
 	})
 
-	It("cleans up a single-stack gateway in OVN", func() {
+	ginkgo.It("cleans up a single-stack gateway in OVN", func() {
 		nodeName := "test-node"
 		hostSubnet := ovntest.MustParseIPNet("10.130.0.0/23")
 		const (
@@ -316,7 +316,7 @@ node4 chassis=912d592c-904c-40cd-9ef1-c2e5b49a33dd lb_force_snat_ip=100.64.0.4`,
 		Expect(fexec.CalledMatchesExpected()).To(BeTrue())
 	})
 
-	It("cleans up a dual-stack gateway in OVN", func() {
+	ginkgo.It("cleans up a dual-stack gateway in OVN", func() {
 		nodeName := "test-node"
 		hostSubnets := ovntest.MustParseIPNets("10.130.0.0/23", "fd01:0:0:2::/64")
 		const (

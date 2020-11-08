@@ -14,11 +14,11 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("OVN Egress Gateway Operations", func() {
+var _ = ginkgo.Describe("OVN Egress Gateway Operations", func() {
 	const (
 		namespaceName    = "namespace1"
 		v4AddressSetName = namespaceName + ipv4AddressSetSuffix
@@ -30,7 +30,7 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 		fExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -42,13 +42,13 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 		fakeOvn = NewFakeOVN(fExec)
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("on setting namespace gateway annotations", func() {
+	ginkgo.Context("on setting namespace gateway annotations", func() {
 
-		It("reconciles an new pod with namespace single exgw annotation already set", func() {
+		ginkgo.It("reconciles an new pod with namespace single exgw annotation already set", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -94,7 +94,7 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles an new pod with namespace double exgw annotation already set", func() {
+		ginkgo.It("reconciles an new pod with namespace double exgw annotation already set", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -144,7 +144,7 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles deleting a pod with namespace double exgw annotation already set", func() {
+		ginkgo.It("reconciles deleting a pod with namespace double exgw annotation already set", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -206,7 +206,7 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles deleting a exgw namespace with active pod", func() {
+		ginkgo.It("reconciles deleting a exgw namespace with active pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -270,8 +270,8 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
-	Context("on setting pod gateway annotations", func() {
-		It("reconciles a host networked pod acting as a exgw for another namespace for new pod", func() {
+	ginkgo.Context("on setting pod gateway annotations", func() {
+		ginkgo.It("reconciles a host networked pod acting as a exgw for another namespace for new pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -320,7 +320,7 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a host networked pod acting as a exgw for another namespace for existing pod", func() {
+		ginkgo.It("reconciles a host networked pod acting as a exgw for another namespace for existing pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")
@@ -369,7 +369,7 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles a multus networked pod acting as a exgw for another namespace for new pod", func() {
+		ginkgo.It("reconciles a multus networked pod acting as a exgw for another namespace for new pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 				ns := nettypes.NetworkStatus{Name: "dummy", IPs: []string{"11.0.0.1"}}
 				networkStatuses := []nettypes.NetworkStatus{ns}
@@ -426,7 +426,7 @@ var _ = Describe("OVN Egress Gateway Operations", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("reconciles deleting a host networked pod acting as a exgw for another namespace for existing pod", func() {
+		ginkgo.It("reconciles deleting a host networked pod acting as a exgw for another namespace for existing pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				namespaceT := *newNamespace("namespace1")

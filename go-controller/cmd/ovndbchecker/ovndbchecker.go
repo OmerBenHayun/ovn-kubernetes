@@ -114,7 +114,6 @@ func main() {
 		}
 	}()
 
-	if err := c.RunContext(ctx, os.Args); err != nil {
 		klog.Exit(err)
 	}
 }

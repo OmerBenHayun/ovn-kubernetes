@@ -28,7 +28,7 @@ import (
 	"github.com/containernetworking/plugins/pkg/testutils"
 	"github.com/vishvananda/netlink"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -172,7 +172,7 @@ func createNodeAnnotationsForSubnet(subnet string) map[string]string {
 	return annotations
 }
 
-var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
+var _ = ginkgo.Describe("Hybrid Overlay Node Linux Operations", func() {
 	var (
 		app      *cli.App
 		fexec    *ovntest.FakeExec
@@ -185,7 +185,7 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		thisSubnet string = "1.2.3.0/24"
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -219,14 +219,14 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		})
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		close(stopChan)
 		wg.Wait()
 		Expect(netns.Close()).To(Succeed())
 		Expect(testutils.UnmountNS(netns)).To(Succeed())
 	})
 
-	It("does not set up tunnels for non-hybrid-overlay nodes without annotations", func() {
+	ginkgo.It("does not set up tunnels for non-hybrid-overlay nodes without annotations", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				node1Name string = "node1"
@@ -273,7 +273,7 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		appRun(app, netns)
 	})
 
-	It("does not set up tunnels for non-hybrid-overlay nodes with subnet annotations", func() {
+	ginkgo.It("does not set up tunnels for non-hybrid-overlay nodes with subnet annotations", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				node1Name   string = "node1"
@@ -322,7 +322,7 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		appRun(app, netns)
 	})
 
-	It("sets up local node hybrid overlay bridge", func() {
+	ginkgo.It("sets up local node hybrid overlay bridge", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				thisDrMAC string = "22:33:44:55:66:77"
@@ -366,7 +366,7 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		}
 		appRun(app, netns)
 	})
-	It("sets up local linux pod", func() {
+	ginkgo.It("sets up local linux pod", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				thisDrMAC string = "22:33:44:55:66:77"
@@ -418,7 +418,7 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		appRun(app, netns)
 	})
 
-	It("sets up tunnels for Windows nodes", func() {
+	ginkgo.It("sets up tunnels for Windows nodes", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				node1Name   string = "node1"
@@ -474,7 +474,7 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		appRun(app, netns)
 	})
 
-	It("removes stale node flows on initial sync", func() {
+	ginkgo.It("removes stale node flows on initial sync", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				node1Name string = "node1"
@@ -526,7 +526,7 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		appRun(app, netns)
 	})
 
-	It("removes stale pod flows on initial sync", func() {
+	ginkgo.It("removes stale pod flows on initial sync", func() {
 		app.Action = func(ctx *cli.Context) error {
 			fakeClient := fake.NewSimpleClientset()
 
@@ -581,7 +581,7 @@ var _ = Describe("Hybrid Overlay Node Linux Operations", func() {
 		appRun(app, netns)
 	})
 
-	It("sets up local pod flows", func() {
+	ginkgo.It("sets up local pod flows", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				pod1IP   string = "1.2.3.5"

@@ -29,13 +29,13 @@ import (
 	egressip "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/crd/egressip/v1"
 	egressipfake "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/crd/egressip/v1/apis/clientset/versioned/fake"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 func TestFactory(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Watch Factory Suite")
+	RegisterFailHandler(ginkgo.Fail)
+	ginkgo.RunSpecs(t, "Watch Factory Suite")
 }
 
 func newObjectMeta(name, namespace string) metav1.ObjectMeta {
@@ -196,7 +196,7 @@ func (c *handlerCalls) getDeleted() int {
 	return int(atomic.LoadInt32(&c.deleted))
 }
 
-var _ = Describe("Watch Factory Operations", func() {
+var _ = ginkgo.Describe("Watch Factory Operations", func() {
 	var (
 		ovnClientset                              *util.OVNClientset
 		fakeClient                                *fake.Clientset
@@ -220,7 +220,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		err                                       error
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
@@ -319,14 +319,14 @@ var _ = Describe("Watch Factory Operations", func() {
 		})
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		wf.Shutdown()
 		if wf.efFactory != nil {
 			wf.ShutdownEgressFirewallWatchFactory()
 		}
 	})
 
-	Context("when a processExisting is given", func() {
+	ginkgo.Context("when a processExisting is given", func() {
 		testExisting := func(objType reflect.Type, namespace string, sel labels.Selector) {
 			wf, err = NewMasterWatchFactory(ovnClientset)
 			Expect(err).NotTo(HaveOccurred())
@@ -342,50 +342,50 @@ var _ = Describe("Watch Factory Operations", func() {
 			wf.removeHandler(objType, h)
 		}
 
-		It("is called for each existing pod", func() {
+		ginkgo.It("is called for each existing pod", func() {
 			pods = append(pods, newPod("pod1", "default"))
 			testExisting(podType, "", nil)
 		})
 
-		It("is called for each existing namespace", func() {
+		ginkgo.It("is called for each existing namespace", func() {
 			namespaces = append(namespaces, newNamespace("default"))
 			testExisting(namespaceType, "", nil)
 		})
 
-		It("is called for each existing node", func() {
+		ginkgo.It("is called for each existing node", func() {
 			nodes = append(nodes, newNode("default"))
 			testExisting(nodeType, "", nil)
 		})
 
-		It("is called for each existing policy", func() {
+		ginkgo.It("is called for each existing policy", func() {
 			policies = append(policies, newPolicy("denyall", "default"))
 			testExisting(policyType, "", nil)
 		})
 
-		It("is called for each existing endpoints", func() {
+		ginkgo.It("is called for each existing endpoints", func() {
 			endpoints = append(endpoints, newEndpoints("myendpoint", "default"))
 			testExisting(endpointsType, "", nil)
 		})
 
-		It("is called for each existing service", func() {
+		ginkgo.It("is called for each existing service", func() {
 			services = append(services, newService("myservice", "default"))
 			testExisting(serviceType, "", nil)
 		})
 
-		It("is called for each existing egressFirewall", func() {
+		ginkgo.It("is called for each existing egressFirewall", func() {
 			egressFirewalls = append(egressFirewalls, newEgressFirewall("myEgressFirewall", "default"))
 			testExisting(egressFirewallType, "", nil)
 		})
-		It("is called for each existing CRDS", func() {
+		ginkgo.It("is called for each existing CRDS", func() {
 			crds = append(crds, newCRD("myCRD", ""))
 			testExisting(crdType, "", nil)
 		})
-		It("is called for each existing egressIP", func() {
+		ginkgo.It("is called for each existing egressIP", func() {
 			egressIPs = append(egressIPs, newEgressIP("myEgressIP", "default"))
 			testExisting(egressIPType, "", nil)
 		})
 
-		It("is called for each existing pod that matches a given namespace and label", func() {
+		ginkgo.It("is called for each existing pod that matches a given namespace and label", func() {
 			pod := newPod("pod1", "default")
 			pod.ObjectMeta.Labels["blah"] = "foobar"
 			pods = append(pods, pod)
@@ -401,7 +401,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		})
 	})
 
-	Context("when existing items are known to the informer", func() {
+	ginkgo.Context("when existing items are known to the informer", func() {
 		testExisting := func(objType reflect.Type) {
 			wf, err = NewMasterWatchFactory(ovnClientset)
 			Expect(err).NotTo(HaveOccurred())
@@ -420,65 +420,65 @@ var _ = Describe("Watch Factory Operations", func() {
 			wf.removeHandler(objType, h)
 		}
 
-		It("calls ADD for each existing pod", func() {
+		ginkgo.It("calls ADD for each existing pod", func() {
 			pods = append(pods, newPod("pod1", "default"))
 			pods = append(pods, newPod("pod2", "default"))
 			testExisting(podType)
 		})
 
-		It("calls ADD for each existing namespace", func() {
+		ginkgo.It("calls ADD for each existing namespace", func() {
 			namespaces = append(namespaces, newNamespace("default"))
 			namespaces = append(namespaces, newNamespace("default2"))
 			testExisting(namespaceType)
 		})
 
-		It("calls ADD for each existing node", func() {
+		ginkgo.It("calls ADD for each existing node", func() {
 			nodes = append(nodes, newNode("default"))
 			nodes = append(nodes, newNode("default2"))
 			testExisting(nodeType)
 		})
 
-		It("calls ADD for each existing policy", func() {
+		ginkgo.It("calls ADD for each existing policy", func() {
 			policies = append(policies, newPolicy("denyall", "default"))
 			policies = append(policies, newPolicy("denyall2", "default"))
 			testExisting(policyType)
 		})
 
-		It("calls ADD for each existing endpoints", func() {
+		ginkgo.It("calls ADD for each existing endpoints", func() {
 			endpoints = append(endpoints, newEndpoints("myendpoint", "default"))
 			endpoints = append(endpoints, newEndpoints("myendpoint2", "default"))
 			testExisting(endpointsType)
 		})
 
-		It("calls ADD for each existing service", func() {
+		ginkgo.It("calls ADD for each existing service", func() {
 			services = append(services, newService("myservice", "default"))
 			services = append(services, newService("myservice2", "default"))
 			testExisting(serviceType)
 		})
-		It("calls ADD for each existing egressFirewall", func() {
+		ginkgo.It("calls ADD for each existing egressFirewall", func() {
 			egressFirewalls = append(egressFirewalls, newEgressFirewall("myFirewall", "default"))
 			egressFirewalls = append(egressFirewalls, newEgressFirewall("myFirewall1", "default"))
 			testExisting(egressFirewallType)
 		})
-		It("calls ADD for each existing CRD", func() {
+		ginkgo.It("calls ADD for each existing CRD", func() {
 			crds = append(crds, newCRD("crd1", ""))
 			crds = append(crds, newCRD("crd2", ""))
 			testExisting(crdType)
 		})
-		It("calls ADD for each existing egressIP", func() {
+		ginkgo.It("calls ADD for each existing egressIP", func() {
 			egressIPs = append(egressIPs, newEgressIP("myEgressIP", "default"))
 			egressIPs = append(egressIPs, newEgressIP("myEgressIP1", "default"))
 			testExisting(egressIPType)
 		})
 	})
 
-	Context("when EgressIP is disabled", func() {
+	ginkgo.Context("when EgressIP is disabled", func() {
 		testExisting := func(objType reflect.Type) {
 			wf, err = NewMasterWatchFactory(ovnClientset)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(wf.informers).NotTo(HaveKey(objType))
 		}
-		It("does not contain Egress IP informer", func() {
+		ginkgo.It("does not contain Egress IP informer", func() {
 			config.OVNKubernetesFeature.EnableEgressIP = false
 			testExisting(egressIPType)
 		})
@@ -511,7 +511,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		return addFilteredHandler(wf, objType, "", nil, funcs)
 	}
 
-	It("responds to pod add/update/delete events", func() {
+	ginkgo.It("responds to pod add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -545,7 +545,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemovePodHandler(h)
 	})
 
-	It("responds to multiple pod add/update/delete events", func() {
+	ginkgo.It("responds to multiple pod add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -626,7 +626,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemovePodHandler(h)
 	})
 
-	It("responds to namespace add/update/delete events", func() {
+	ginkgo.It("responds to namespace add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -660,7 +660,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemoveNamespaceHandler(h)
 	})
 
-	It("responds to node add/update/delete events", func() {
+	ginkgo.It("responds to node add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -694,7 +694,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemoveNodeHandler(h)
 	})
 
-	It("responds to multiple node add/update/delete events", func() {
+	ginkgo.It("responds to multiple node add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -774,7 +774,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemoveNodeHandler(h)
 	})
 
-	It("correctly orders queued informer initial add events and subsequent update events", func() {
+	ginkgo.It("correctly orders queued informer initial add events and subsequent update events", func() {
 		type opTest struct {
 			mu      sync.Mutex
 			node    *v1.Node
@@ -856,7 +856,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemoveNodeHandler(h)
 	})
 
-	It("correctly orders serialized informer initial add events and subsequent update events", func() {
+	ginkgo.It("correctly orders serialized informer initial add events and subsequent update events", func() {
 		type opTest struct {
 			mu        sync.Mutex
 			namespace *v1.Namespace
@@ -938,7 +938,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemoveNamespaceHandler(h)
 	})
 
-	It("responds to policy add/update/delete events", func() {
+	ginkgo.It("responds to policy add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -972,7 +972,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemovePolicyHandler(h)
 	})
 
-	It("responds to endpoints add/update/delete events", func() {
+	ginkgo.It("responds to endpoints add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -1013,7 +1013,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemoveEndpointsHandler(h)
 	})
 
-	It("responds to service add/update/delete events", func() {
+	ginkgo.It("responds to service add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -1047,7 +1047,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemoveServiceHandler(h)
 	})
 
-	It("responds to egressFirewall add/update/delete events", func() {
+	ginkgo.It("responds to egressFirewall add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		err = wf.InitializeEgressFirewallWatchFactory()
 		Expect(err).NotTo(HaveOccurred())
@@ -1081,7 +1081,7 @@ var _ = Describe("Watch Factory Operations", func() {
 
 		wf.RemoveEgressFirewallHandler(h)
 	})
-	It("responds to crd add/update/delete events", func() {
+	ginkgo.It("responds to crd add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -1115,7 +1115,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		wf.RemoveCRDHandler(h)
 
 	})
-	It("responds to egressIP add/update/delete events", func() {
+	ginkgo.It("responds to egressIP add/update/delete events", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -1148,7 +1148,7 @@ var _ = Describe("Watch Factory Operations", func() {
 
 		wf.RemoveEgressIPHandler(h)
 	})
-	It("stops processing events after the handler is removed", func() {
+	ginkgo.It("stops processing events after the handler is removed", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -1177,7 +1177,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		Consistently(c.getDeleted, 2).Should(Equal(0))
 	})
 
-	It("filters correctly by label and namespace", func() {
+	ginkgo.It("filters correctly by label and namespace", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -1246,7 +1246,7 @@ var _ = Describe("Watch Factory Operations", func() {
 		Eventually(c.getDeleted, 2).Should(Equal(1))
 	})
 
-	It("correctly handles object updates that cause filter changes", func() {
+	ginkgo.It("correctly handles object updates that cause filter changes", func() {
 		wf, err = NewMasterWatchFactory(ovnClientset)
 		Expect(err).NotTo(HaveOccurred())
 

@@ -24,7 +24,7 @@ import (
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/types"
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/util"
 
-	. "github.com/onsi/ginkgo"
+	 "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
@@ -68,7 +68,7 @@ func newTestNode(name, os, ovnHostSubnet, hybridHostSubnet, drMAC string) v1.Nod
 	}
 }
 
-var _ = Describe("Hybrid SDN Master Operations", func() {
+var _ = ginkgo.Describe("Hybrid SDN Master Operations", func() {
 	var (
 		app      *cli.App
 		stopChan chan struct{}
@@ -76,7 +76,7 @@ var _ = Describe("Hybrid SDN Master Operations", func() {
 		fexec    *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -90,13 +90,13 @@ var _ = Describe("Hybrid SDN Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		close(stopChan)
 		wg.Wait()
 	})
 
 	const hybridOverlayClusterCIDR string = "11.1.0.0/16/24"
-	It("allocates and assigns a hybrid-overlay subnet to a Windows node that doesn't have one", func() {
+	ginkgo.It("allocates and assigns a hybrid-overlay subnet to a Windows node that doesn't have one", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				nodeName   string = "node1"
@@ -167,7 +167,7 @@ var _ = Describe("Hybrid SDN Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("sets up and cleans up a Linux node with a OVN hostsubnet annotation", func() {
+	ginkgo.It("sets up and cleans up a Linux node with a OVN hostsubnet annotation", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				nodeName   string = "node1"
@@ -241,7 +241,7 @@ var _ = Describe("Hybrid SDN Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("handles a Linux node with no annotation but an existing port", func() {
+	ginkgo.It("handles a Linux node with no annotation but an existing port", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				nodeName   string = "node1"
@@ -301,7 +301,7 @@ var _ = Describe("Hybrid SDN Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("cleans up a Linux node when the OVN hostsubnet annotation is removed", func() {
+	ginkgo.It("cleans up a Linux node when the OVN hostsubnet annotation is removed", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				nodeName   string = "node1"
@@ -377,7 +377,7 @@ var _ = Describe("Hybrid SDN Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("copies namespace annotations when a pod is added", func() {
+	ginkgo.It("copies namespace annotations when a pod is added", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				nsName     string = "nstest"
@@ -464,7 +464,7 @@ var _ = Describe("Hybrid SDN Master Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("update pod annotations when a namespace is updated", func() {
+	ginkgo.It("update pod annotations when a namespace is updated", func() {
 		app.Action = func(ctx *cli.Context) error {
 			const (
 				nsName        string = "nstest"
