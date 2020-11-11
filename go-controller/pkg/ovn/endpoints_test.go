@@ -16,8 +16,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 )
 
 type endpoints struct{}
@@ -133,14 +133,14 @@ func (e endpoints) delCmds(fexec *ovntest.FakeExec, service v1.Service, endpoint
 	}
 }
 
-var _ = Describe("OVN Namespace Operations", func() {
+var _ = ginkgo.Describe("OVN Namespace Operations", func() {
 	var (
 		app     *cli.App
 		fakeOvn *FakeOVN
 		tExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -152,13 +152,13 @@ var _ = Describe("OVN Namespace Operations", func() {
 		fakeOvn = NewFakeOVN(tExec)
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("on startup", func() {
+	ginkgo.Context("on startup", func() {
 
-		It("reconciles existing endpoints", func() {
+		ginkgo.It("reconciles existing endpoints", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -206,17 +206,17 @@ var _ = Describe("OVN Namespace Operations", func() {
 				fakeOvn.controller.WatchEndpoints()
 
 				_, err := fakeOvn.fakeClient.KubeClient.CoreV1().Endpoints(endpointsT.Namespace).Get(context.TODO(), endpointsT.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(tExec.CalledMatchesExpected()).To(BeTrue(), tExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Expect(tExec.CalledMatchesExpected()).To(gomega.BeTrue(), tExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles existing endpoints with ExternalIP", func() {
+		ginkgo.It("reconciles existing endpoints with ExternalIP", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -268,17 +268,17 @@ var _ = Describe("OVN Namespace Operations", func() {
 				fakeOvn.controller.WatchEndpoints()
 
 				_, err := fakeOvn.fakeClient.KubeClient.CoreV1().Endpoints(endpointsT.Namespace).Get(context.TODO(), endpointsT.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(tExec.CalledMatchesExpected()).To(BeTrue(), tExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Expect(tExec.CalledMatchesExpected()).To(gomega.BeTrue(), tExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles existing endpoints with NodePort", func() {
+		ginkgo.It("reconciles existing endpoints with NodePort", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -328,17 +328,17 @@ var _ = Describe("OVN Namespace Operations", func() {
 				fakeOvn.controller.WatchEndpoints()
 
 				_, err := fakeOvn.fakeClient.KubeClient.CoreV1().Endpoints(endpointsT.Namespace).Get(context.TODO(), endpointsT.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(tExec.CalledMatchesExpected()).To(BeTrue(), tExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Expect(tExec.CalledMatchesExpected()).To(gomega.BeTrue(), tExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles deleted endpoints", func() {
+		ginkgo.It("reconciles deleted endpoints", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -385,24 +385,24 @@ var _ = Describe("OVN Namespace Operations", func() {
 				fakeOvn.controller.WatchEndpoints()
 
 				_, err := fakeOvn.fakeClient.KubeClient.CoreV1().Endpoints(endpointsT.Namespace).Get(context.TODO(), endpointsT.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(tExec.CalledMatchesExpected).Should(BeTrue(), tExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(tExec.CalledMatchesExpected).Should(gomega.BeTrue(), tExec.ErrorDesc)
 
 				// Delete the endpoint
 				testE.delCmds(tExec, serviceT, endpointsT)
 
 				err = fakeOvn.fakeClient.KubeClient.CoreV1().Endpoints(endpointsT.Namespace).Delete(context.TODO(), endpointsT.Name, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(tExec.CalledMatchesExpected).Should(BeTrue(), tExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(tExec.CalledMatchesExpected).Should(gomega.BeTrue(), tExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles deleted NodePort endpoints", func() {
+		ginkgo.It("reconciles deleted NodePort endpoints", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				testE := endpoints{}
@@ -450,22 +450,22 @@ var _ = Describe("OVN Namespace Operations", func() {
 				fakeOvn.controller.WatchEndpoints()
 
 				_, err := fakeOvn.fakeClient.KubeClient.CoreV1().Endpoints(endpointsT.Namespace).Get(context.TODO(), endpointsT.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(tExec.CalledMatchesExpected).Should(BeTrue(), tExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(tExec.CalledMatchesExpected).Should(gomega.BeTrue(), tExec.ErrorDesc)
 
 				// Delete the endpoint
 				testE.delCmds(tExec, serviceT, endpointsT)
 				testE.delNodePortPortCmds(tExec, serviceT, endpointsT)
 
 				err = fakeOvn.fakeClient.KubeClient.CoreV1().Endpoints(endpointsT.Namespace).Delete(context.TODO(), endpointsT.Name, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(tExec.CalledMatchesExpected).Should(BeTrue(), tExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(tExec.CalledMatchesExpected).Should(gomega.BeTrue(), tExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 	})
 })

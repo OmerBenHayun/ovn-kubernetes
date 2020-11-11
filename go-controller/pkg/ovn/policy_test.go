@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/config"
 	ovntest "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/testing"
@@ -286,7 +286,7 @@ func (p multicastPolicy) delPodCmds(fExec *ovntest.FakeExec, ns string) {
 	})
 }
 
-var _ = Describe("OVN NetworkPolicy Operations", func() {
+var _ = ginkgo.Describe("OVN NetworkPolicy Operations", func() {
 	const (
 		namespaceName1    = "namespace1"
 		v4AddressSetName1 = namespaceName1 + ipv4AddressSetSuffix
@@ -302,7 +302,7 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 		fExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -314,13 +314,13 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 		fakeOvn = NewFakeOVN(fExec)
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOvn.shutdown()
 	})
 
-	Context("on startup", func() {
+	ginkgo.Context("on startup", func() {
 
-		It("reconciles an existing ingress networkPolicy with a namespace selector", func() {
+		ginkgo.It("reconciles an existing ingress networkPolicy with a namespace selector", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -383,17 +383,17 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				eventuallyExpectEmptyAddressSets(fakeOvn, networkPolicy)
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles an existing gress networkPolicy with a pod selector in its own namespace", func() {
+		ginkgo.It("reconciles an existing gress networkPolicy with a pod selector in its own namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -470,17 +470,17 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName1)
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles an existing gress networkPolicy with a pod and namespace selector in another namespace", func() {
+		ginkgo.It("reconciles an existing gress networkPolicy with a pod and namespace selector in another namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -571,20 +571,20 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName2)
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 	})
 
-	Context("during execution", func() {
+	ginkgo.Context("during execution", func() {
 
-		It("correctly creates a networkpolicy allowing a port to a local pod", func() {
+		ginkgo.It("correctly creates a networkpolicy allowing a port to a local pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 				npTest := networkPolicy{}
 
@@ -658,8 +658,8 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.controller.WatchNetworkPolicy()
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				fakeOvn.asf.ExpectAddressSetWithIPs(v4AddressSetName1, []string{nPodTest.podIP})
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName1)
 
@@ -667,10 +667,10 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles a deleted namespace referenced by a networkpolicy with a local running pod", func() {
+		ginkgo.It("reconciles a deleted namespace referenced by a networkpolicy with a local running pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -746,8 +746,8 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.controller.WatchNetworkPolicy()
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				fakeOvn.asf.ExpectAddressSetWithIPs(v4AddressSetName1, []string{nPodTest.podIP})
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName1)
 
@@ -763,8 +763,8 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				})
 
 				err = fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Delete(context.TODO(), namespace2.Name, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				fakeOvn.asf.EventuallyExpectNoAddressSet(v4AddressSetName2)
 				fakeOvn.asf.EventuallyExpectNoAddressSet(v6AddressSetName2)
 
@@ -772,10 +772,10 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles a deleted namespace referenced by a networkpolicy", func() {
+		ginkgo.It("reconciles a deleted namespace referenced by a networkpolicy", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -831,8 +831,8 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.controller.WatchNetworkPolicy()
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				fExec.AddFakeCmd(&ovntest.ExpectedCmd{
 					Cmd:    "ovn-nbctl --timeout=15 --data=bare --no-heading --columns=_uuid find ACL match=\"ip4.src == {$a3128014386057836746, $a4615334824109672969} && outport == @a14195333570786048679\" external-ids:namespace=namespace1 external-ids:policy=networkpolicy1 external-ids:Ingress_num=0 external-ids:policy_type=Ingress",
@@ -846,18 +846,18 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				})
 
 				err = fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Delete(context.TODO(), namespace2.Name, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				fakeOvn.asf.EventuallyExpectNoAddressSet(v4AddressSetName2)
 				fakeOvn.asf.EventuallyExpectNoAddressSet(v6AddressSetName2)
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles a deleted pod referenced by a networkpolicy in its own namespace", func() {
+		ginkgo.It("reconciles a deleted pod referenced by a networkpolicy in its own namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -934,14 +934,14 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName1)
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				npTest.delPodCmds(fExec, networkPolicy)
 
 				err = fakeOvn.fakeClient.KubeClient.CoreV1().Pods(nPodTest.namespace).Delete(context.TODO(), nPodTest.podName, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				eventuallyExpectEmptyAddressSets(fakeOvn, networkPolicy)
 				fakeOvn.asf.EventuallyExpectEmptyAddressSet(v4AddressSetName1)
@@ -949,10 +949,10 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles a deleted pod referenced by a networkpolicy in another namespace", func() {
+		ginkgo.It("reconciles a deleted pod referenced by a networkpolicy in another namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -1042,12 +1042,12 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName2)
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				err = fakeOvn.fakeClient.KubeClient.CoreV1().Pods(nPodTest.namespace).Delete(context.TODO(), nPodTest.podName, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				// After deleting the pod all address sets should be empty
 				eventuallyExpectEmptyAddressSets(fakeOvn, networkPolicy)
@@ -1057,10 +1057,10 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("reconciles a deleted networkpolicy", func() {
+		ginkgo.It("reconciles a deleted networkpolicy", func() {
 			app.Action = func(ctx *cli.Context) error {
 
 				npTest := networkPolicy{}
@@ -1133,26 +1133,26 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.controller.WatchNetworkPolicy()
 
 				_, err := fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Get(context.TODO(), networkPolicy.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				fakeOvn.asf.ExpectAddressSetWithIPs(v4AddressSetName1, []string{nPodTest.podIP})
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName1)
 
 				npTest.delCmds(fExec, nPodTest, networkPolicy, true)
 
 				err = fakeOvn.fakeClient.KubeClient.NetworkingV1().NetworkPolicies(networkPolicy.Namespace).Delete(context.TODO(), networkPolicy.Name, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				eventuallyExpectNoAddressSets(fakeOvn, networkPolicy)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("tests enabling/disabling multicast in a namespace", func() {
+		ginkgo.It("tests enabling/disabling multicast in a namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespace1 := *newNamespace(namespaceName1)
 
@@ -1167,35 +1167,35 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.controller.WatchNamespaces()
 				ns, err := fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Get(
 					context.TODO(), namespace1.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(ns).NotTo(BeNil())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Expect(ns).NotTo(gomega.BeNil())
 
 				// Multicast is denied by default.
 				_, ok := ns.Annotations[nsMulticastAnnotation]
-				Expect(ok).To(BeFalse())
+				gomega.Expect(ok).To(gomega.BeFalse())
 
 				// Enable multicast in the namespace.
 				mcastPolicy := multicastPolicy{}
 				mcastPolicy.enableCmds(fExec, namespace1.Name, v4AddressSetName1)
 				ns.Annotations[nsMulticastAnnotation] = "true"
 				_, err = fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				// Disable multicast in the namespace.
 				mcastPolicy.disableCmds(fExec, namespace1.Name, v4AddressSetName1)
 				ns.Annotations[nsMulticastAnnotation] = "false"
 				_, err = fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("tests enabling multicast in a namespace with a pod", func() {
+		ginkgo.It("tests enabling multicast in a namespace with a pod", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespace1 := *newNamespace(namespaceName1)
 
@@ -1228,9 +1228,9 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.controller.WatchPods()
 				ns, err := fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Get(
 					context.TODO(), namespace1.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(ns).NotTo(BeNil())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Expect(ns).NotTo(gomega.BeNil())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				// Enable multicast in the namespace
 				mcastPolicy := multicastPolicy{}
 				mcastPolicy.enableCmds(fExec, namespace1.Name, v4AddressSetName1)
@@ -1238,18 +1238,18 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				mcastPolicy.addPodCmds(fExec, namespace1.Name)
 				ns.Annotations[nsMulticastAnnotation] = "true"
 				_, err = fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				fakeOvn.asf.ExpectAddressSetWithIPs(v4AddressSetName1, []string{nPodTest.podIP})
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName1)
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		It("tests adding a pod to a multicast enabled namespace", func() {
+		ginkgo.It("tests adding a pod to a multicast enabled namespace", func() {
 			app.Action = func(ctx *cli.Context) error {
 				namespace1 := *newNamespace(namespaceName1)
 
@@ -1277,16 +1277,16 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 				fakeOvn.controller.WatchPods()
 				ns, err := fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Get(
 					context.TODO(), namespace1.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Expect(ns).NotTo(BeNil())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Expect(ns).NotTo(gomega.BeNil())
 
 				// Enable multicast in the namespace.
 				mcastPolicy := multicastPolicy{}
 				mcastPolicy.enableCmds(fExec, namespace1.Name, v4AddressSetName1)
 				ns.Annotations[nsMulticastAnnotation] = "true"
 				_, err = fakeOvn.fakeClient.KubeClient.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				nPodTest.populateLogicalSwitchCache(fakeOvn)
 
@@ -1295,8 +1295,8 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 
 				_, err = fakeOvn.fakeClient.KubeClient.CoreV1().Pods(nPodTest.namespace).Create(context.TODO(), newPod(
 					nPodTest.namespace, nPodTest.podName, nPodTest.nodeName, nPodTest.podIP), metav1.CreateOptions{})
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				fakeOvn.asf.ExpectAddressSetWithIPs(v4AddressSetName1, []string{nPodTest.podIP})
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName1)
 
@@ -1305,15 +1305,15 @@ var _ = Describe("OVN NetworkPolicy Operations", func() {
 
 				err = fakeOvn.fakeClient.KubeClient.CoreV1().Pods(nPodTest.namespace).Delete(context.TODO(),
 					nPodTest.podName, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 				fakeOvn.asf.ExpectEmptyAddressSet(v4AddressSetName1)
 				fakeOvn.asf.ExpectNoAddressSet(v6AddressSetName1)
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 	})
 })
@@ -1353,25 +1353,25 @@ func addExpectedGressCmds(fExec *ovntest.FakeExec, gp *gressPolicy, pgName strin
 	return newAS
 }
 
-var _ = Describe("OVN NetworkPolicy Low-Level Operations", func() {
+var _ = ginkgo.Describe("OVN NetworkPolicy Low-Level Operations", func() {
 	var (
 		fExec     *ovntest.FakeExec
 		asFactory *fakeAddressSetFactory
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 		fExec = ovntest.NewLooseCompareFakeExec()
 		err := util.SetExec(fExec)
-		Expect(err).NotTo(HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 		asFactory = newFakeAddressSetFactory()
 		config.IPv4Mode = true
 		config.IPv6Mode = false
 	})
 
-	It("computes match strings from address sets correctly", func() {
+	ginkgo.It("computes match strings from address sets correctly", func() {
 		const (
 			pgUUID string = "pg-uuid"
 			pgName string = "pg-name"
@@ -1387,7 +1387,7 @@ var _ = Describe("OVN NetworkPolicy Low-Level Operations", func() {
 
 		gp := newGressPolicy(knet.PolicyTypeIngress, 0, policy.Namespace, policy.Name)
 		err := gp.ensurePeerAddressSet(asFactory)
-		Expect(err).NotTo(HaveOccurred())
+		gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		asName := getIPv4ASName(gp.peerAddressSet.GetName())
 
 		one := fmt.Sprintf("testing.policy.ingress.1")
@@ -1406,69 +1406,69 @@ var _ = Describe("OVN NetworkPolicy Low-Level Operations", func() {
 
 		cur := addExpectedGressCmds(fExec, gp, pgName, []string{asName}, []string{asName, v4One})
 		gp.addNamespaceAddressSet(one, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4One, v4Two})
 		gp.addNamespaceAddressSet(two, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		// address sets should be alphabetized
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4One, v4Two, v4Three})
 		gp.addNamespaceAddressSet(three, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		// re-adding an existing set is a no-op
 		gp.addNamespaceAddressSet(one, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4One, v4Two, v4Three, v4Four})
 		gp.addNamespaceAddressSet(four, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		// now delete a set
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4Two, v4Three, v4Four})
 		gp.delNamespaceAddressSet(one, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		// deleting again is a no-op
 		gp.delNamespaceAddressSet(one, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		// add and delete some more...
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4Two, v4Three, v4Four, v4Five})
 		gp.addNamespaceAddressSet(five, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4Two, v4Four, v4Five})
 		gp.delNamespaceAddressSet(three, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		// deleting again is no-op
 		gp.delNamespaceAddressSet(one, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4Two, v4Four, v4Five, v4Six})
 		gp.addNamespaceAddressSet(six, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4Four, v4Five, v4Six})
 		gp.delNamespaceAddressSet(two, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4Four, v4Six})
 		gp.delNamespaceAddressSet(five, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName, v4Four})
 		gp.delNamespaceAddressSet(six, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		cur = addExpectedGressCmds(fExec, gp, pgName, cur, []string{asName})
 		gp.delNamespaceAddressSet(four, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 
 		// deleting again is no-op
 		gp.delNamespaceAddressSet(four, pgName)
-		Expect(fExec.CalledMatchesExpected()).To(BeTrue(), fExec.ErrorDesc)
+		gomega.Expect(fExec.CalledMatchesExpected()).To(gomega.BeTrue(), fExec.ErrorDesc)
 	})
 })

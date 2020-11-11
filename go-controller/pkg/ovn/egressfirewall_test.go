@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 
 	"github.com/ovn-org/ovn-kubernetes/go-controller/pkg/config"
 	egressfirewallapi "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/crd/egressfirewall/v1"
@@ -37,14 +37,14 @@ func newEgressFirewallObject(name, namespace string, egressRules []egressfirewal
 	}
 }
 
-var _ = Describe("OVN EgressFirewall Operations", func() {
+var _ = ginkgo.Describe("OVN EgressFirewall Operations", func() {
 	var (
 		app     *cli.App
 		fakeOVN *FakeOVN
 		fExec   *ovntest.FakeExec
 	)
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		// Restore global default values before each testcase
 		config.PrepareTestConfig()
 
@@ -57,12 +57,12 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 
 	})
 
-	AfterEach(func() {
+	ginkgo.AfterEach(func() {
 		fakeOVN.shutdown()
 	})
 
-	Context("on startup", func() {
-		It("reconciles an existing egressFirewall", func() {
+	ginkgo.Context("on startup", func() {
+		ginkgo.It("reconciles an existing egressFirewall", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					node1Name string = "node1"
@@ -107,20 +107,20 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 				fakeOVN.controller.WatchEgressFirewall()
 
 				_, err := fakeOVN.fakeClient.EgressFirewallClient.K8sV1().EgressFirewalls(egressFirewall.Namespace).Get(context.TODO(), egressFirewall.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 		})
 	})
-	Context("during execution", func() {
-		It("correctly creates an egressfirewall denying traffic all udp traffic", func() {
+	ginkgo.Context("during execution", func() {
+		ginkgo.It("correctly creates an egressfirewall denying traffic all udp traffic", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					node1Name string = "node1"
@@ -166,18 +166,18 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 
 				fakeOVN.controller.WatchNamespaces()
 				_, err := fakeOVN.fakeClient.EgressFirewallClient.K8sV1().EgressFirewalls(egressFirewall.Namespace).Get(context.TODO(), egressFirewall.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 				fakeOVN.controller.WatchEgressFirewall()
 
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				return nil
 			}
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
-		It("correctly deletes an egressfirewall", func() {
+		ginkgo.It("correctly deletes an egressfirewall", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					node1Name string = "node1"
@@ -237,17 +237,17 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 				fakeOVN.controller.WatchEgressFirewall()
 
 				err := fakeOVN.fakeClient.EgressFirewallClient.K8sV1().EgressFirewalls(egressFirewall.Namespace).Delete(context.TODO(), egressFirewall.Name, *metav1.NewDeleteOptions(0))
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
-		It("correctly updates an egressfirewall", func() {
+		ginkgo.It("correctly updates an egressfirewall", func() {
 			app.Action = func(ctx *cli.Context) error {
 				const (
 					node1Name string = "node1"
@@ -306,17 +306,17 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 				fakeOVN.controller.WatchEgressFirewall()
 
 				_, err := fakeOVN.fakeClient.EgressFirewallClient.K8sV1().EgressFirewalls(egressFirewall.Namespace).Get(context.TODO(), egressFirewall.Name, metav1.GetOptions{})
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				_, err = fakeOVN.fakeClient.EgressFirewallClient.K8sV1().EgressFirewalls(egressFirewall1.Namespace).Update(context.TODO(), egressFirewall1, metav1.UpdateOptions{})
-				Expect(err).NotTo(HaveOccurred())
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-				Eventually(fExec.CalledMatchesExpected).Should(BeTrue(), fExec.ErrorDesc)
+				gomega.Eventually(fExec.CalledMatchesExpected).Should(gomega.BeTrue(), fExec.ErrorDesc)
 
 				return nil
 			}
 
 			err := app.Run([]string{app.Name})
-			Expect(err).NotTo(HaveOccurred())
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
 		})
 
@@ -324,9 +324,9 @@ var _ = Describe("OVN EgressFirewall Operations", func() {
 
 })
 
-var _ = Describe("OVN test basic functions", func() {
+var _ = ginkgo.Describe("OVN test basic functions", func() {
 
-	It("computes correct L4Match", func() {
+	ginkgo.It("computes correct L4Match", func() {
 		type testcase struct {
 			ports         []egressfirewallapi.EgressFirewallPort
 			expectedMatch string
@@ -404,7 +404,7 @@ var _ = Describe("OVN test basic functions", func() {
 		}
 		for _, test := range testcases {
 			l4Match := egressGetL4Match(test.ports)
-			Expect(test.expectedMatch).To(Equal(l4Match))
+			gomega.Expect(test.expectedMatch).To(gomega.Equal(l4Match))
 		}
 	})
 })
