@@ -10,7 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	utilnet "k8s.io/utils/net"
 
-	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega"
 )
 
 func newFakeAddressSetFactory() *fakeAddressSetFactory {
@@ -33,7 +33,7 @@ func (f *fakeAddressSetFactory) NewAddressSet(name string, ips []net.IP) (Addres
 	f.Lock()
 	defer f.Unlock()
 	_, ok := f.sets[name]
-	Expect(ok).To(BeFalse())
+	gomega.Expect(ok).To(gomega.BeFalse())
 	set, err := newFakeAddressSets(name, ips, f.removeAddressSet)
 	if err != nil {
 		return nil, err
@@ -100,18 +100,18 @@ func (f *fakeAddressSetFactory) removeAddressSet(name string) {
 // ExpectNoAddressSet ensures the named address set does not exist
 func (f *fakeAddressSetFactory) ExpectNoAddressSet(name string) {
 	_, ok := f.sets[name]
-	Expect(ok).To(BeFalse())
+	gomega.Expect(ok).To(gomega.BeFalse())
 }
 
 // ExpectAddressSetWithIPs ensures the named address set exists with the given set of IPs
 func (f *fakeAddressSetFactory) ExpectAddressSetWithIPs(name string, ips []string) {
 	as := f.getAddressSet(name)
-	Expect(as).NotTo(BeNil())
+	gomega.Expect(as).NotTo(gomega.BeNil())
 	defer as.Unlock()
 	for _, expectedIP := range ips {
-		Expect(as.ips).To(HaveKey(expectedIP))
+		gomega.Expect(as.ips).To(gomega.HaveKey(expectedIP))
 	}
-	Expect(as.ips).To(HaveLen(len(ips)))
+	gomega.Expect(as.ips).To(gomega.HaveLen(len(ips)))
 }
 
 // ExpectEmptyAddressSet ensures the named address set exists with no IPs
@@ -121,22 +121,22 @@ func (f *fakeAddressSetFactory) ExpectEmptyAddressSet(name string) {
 
 // EventuallyExpectEmptyAddressSet ensures the named address set eventually exists with no IPs
 func (f *fakeAddressSetFactory) EventuallyExpectEmptyAddressSet(name string) {
-	Eventually(func() bool {
+	gomega.Eventually(func() bool {
 		as := f.getAddressSet(name)
-		Expect(as).NotTo(BeNil())
+		gomega.Expect(as).NotTo(gomega.BeNil())
 		defer as.Unlock()
 		return len(as.ips) == 0
-	}).Should(BeTrue())
+	}).Should(gomega.BeTrue())
 }
 
 // EventuallyExpectNoAddressSet ensures the named address set eventually does not exist
 func (f *fakeAddressSetFactory) EventuallyExpectNoAddressSet(name string) {
-	Eventually(func() bool {
+	gomega.Eventually(func() bool {
 		f.RLock()
 		defer f.RUnlock()
 		_, ok := f.sets[name]
 		return ok
-	}).Should(BeFalse())
+	}).Should(gomega.BeFalse())
 }
 
 type removeFunc func(string)
@@ -264,17 +264,17 @@ func (as *fakeAddressSets) Destroy() error {
 }
 
 func (as *fakeAddressSet) getHashName() string {
-	Expect(as.destroyed).To(BeFalse())
+	gomega.Expect(as.destroyed).To(gomega.BeFalse())
 	return as.hashName
 }
 
 func (as *fakeAddressSet) getName() string {
-	Expect(as.destroyed).To(BeFalse())
+	gomega.Expect(as.destroyed).To(gomega.BeFalse())
 	return as.name
 }
 
 func (as *fakeAddressSet) addIP(ip net.IP) error {
-	Expect(as.destroyed).To(BeFalse())
+	gomega.Expect(as.destroyed).To(gomega.BeFalse())
 	ipStr := ip.String()
 	if _, ok := as.ips[ipStr]; !ok {
 		as.ips[ip.String()] = ip
@@ -285,19 +285,19 @@ func (as *fakeAddressSet) addIP(ip net.IP) error {
 func (as *fakeAddressSet) deleteIP(ip net.IP) error {
 	as.Lock()
 	defer as.Unlock()
-	Expect(as.destroyed).To(BeFalse())
+	gomega.Expect(as.destroyed).To(gomega.BeFalse())
 	delete(as.ips, ip.String())
 	return nil
 }
 
 func (as *fakeAddressSet) destroyInternal() {
-	Expect(as.destroyed).To(BeFalse())
+	gomega.Expect(as.destroyed).To(gomega.BeFalse())
 	as.destroyed = true
 	as.removeFn(as.name)
 }
 
 func (as *fakeAddressSet) destroy() error {
-	Expect(as.destroyed).To(BeFalse())
+	gomega.Expect(as.destroyed).To(gomega.BeFalse())
 	as.destroyInternal()
 	return nil
 }
