@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/onsi/ginkgo"
@@ -2275,6 +2276,40 @@ var _ = ginkgo.Describe("e2e delete databases", func() {
 		errChan <- nil
 	}
 
+	waitForPodsToFinishFullRestart := func(f *framework.Framework, ns string, name string) {
+
+		isPending := func(pod *v1.Pod) (bool, error) {
+			if pod.Status.Phase == v1.PodPending {
+				return true, nil
+			}
+			return false, fmt.Errorf("Expected pod %q in namespace %q to be in phase Pending, but got phase: %v", pod.Name, pod.Namespace, pod.Status.Phase)
+		}
+
+		pods, err := e2epod.GetPods(f.ClientSet, ns, map[string]string{"name": name})
+		if err != nil {
+			framework.Failf("Error: Failed to get pods, err: %v", err)
+		}
+
+		var wg sync.WaitGroup
+		for _, pod := range pods {
+			wg.Add(1)
+			go func(pod v1.Pod) {
+				defer wg.Done()
+				err := e2epod.WaitForPodCondition(f.ClientSet, ns, pod.Name, "pod is on pending state", 5*time.Minute, isPending)
+				if err != nil {
+					framework.Failf("pod %v is not arrived to pending state: %v", pod.Name, err)
+				}
+			}(pod)
+		}
+		wg.Wait()
+
+		err = e2epod.WaitForPodsReady(f.ClientSet, ns, name, 0)
+		if err != nil {
+			framework.Failf("db-pods are not ready: %v", err)
+		}
+		return
+	}
+
 	table.DescribeTable("recovering from deleting db files while maintain connectivity",
 		func(db_pod_num int, DBFileNamesToDelete []string) {
 			if db_pod_num < haModeMinDb || db_pod_num > haModeMaxDb {
@@ -2317,4 +2352,33 @@ var _ = ginkgo.Describe("e2e delete databases", func() {
 		//table.Entry("when delete north db on ovnkube-db-2", 2, []string{northDBFileName}),
 		//table.Entry("when delete south db on ovnkube-db-2", 2, []string{southDBFileName}),
 	)
+
+	ginkgo.It("Should validate connectivity before and after deleting all the db-pods at once", func() {
+
+		dbPodList, err := e2epod.GetPods(f.ClientSet, ovnNs, map[string]string{"name": databasePodPrefix})
+		if err != nil {
+			framework.Failf("Error: Failed to get pods, err: %v", err)
+		}
+		if len(dbPodList) == 0 {
+			framework.Failf("Error: db pods not found")
+		}
+
+		framework.Logf("test simple connectivity from new pod to API server,before deleting db pods")
+		//singlePodConnectivityTest(f, "before-delete-db-pods")
+
+		framework.Logf("deleting all the db pods")
+		for _, dbPod := range dbPodList {
+			dbPodName := dbPod.Name
+			framework.Logf("deleting db pod: %v", dbPodName)
+			//delete the db-pod in order to emulate the pod restart
+			deletePod(f, ovnNs, dbPodName)
+		}
+
+		framework.Logf("wait for all the pods to finish full restart")
+		waitForPodsToFinishFullRestart(f, ovnNs, databasePodPrefix)
+		framework.Logf("all the pods finish full restart")
+
+		framework.Logf("test simple connectivity from new pod to API server,after recovery")
+		singlePodConnectivityTest(f, "after-delete-db-pods")
+	})
 })
