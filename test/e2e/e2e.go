@@ -342,6 +342,20 @@ func getPodAddress(podName, namespace string) string {
 	return podIP
 }
 
+// Get the IP address of the API server
+func getApiAddress() string {
+	apiServerIP, err := framework.RunKubectl("default", "get", "svc", "kubernetes", "-o", "jsonpath='{.spec.clusterIP}'")
+	apiServerIP = strings.Trim(apiServerIP, "'")
+	if err != nil {
+		framework.Failf("Error: unable to get API-server IP address, err:  %v", err)
+	}
+	apiServer := net.ParseIP(apiServerIP)
+	if apiServer == nil {
+		framework.Failf("Error: unable to parse API-server IP address:  %s", apiServerIP)
+	}
+	return apiServer.String()
+}
+
 // runCommand runs the cmd and returns the combined stdout and stderr
 func runCommand(cmd ...string) (string, error) {
 	output, err := exec.Command(cmd[0], cmd[1:]...).CombinedOutput()
@@ -1508,3 +1522,60 @@ func getNodePodCIDR(nodeName string) (string, error) {
 	}
 	return "", fmt.Errorf("could not parse annotation %q", annotation)
 }
+
+var _ = ginkgo.Describe("e2e delete all db-pods", func() {
+	const (
+		svcname                   string        = "delete-all-db-pods"
+		ovnNs                     string        = "ovn-kubernetes"
+		databasePodPrefix         string        = "ovnkube-db"
+		waitingPeriod             time.Duration = 90 * time.Second
+	)
+	f := framework.NewDefaultFramework(svcname)
+	deletePodFromNamespace := func(f *framework.Framework, namespace string, podName string) {
+		podClient := f.ClientSet.CoreV1().Pods(namespace)
+		err := podClient.Delete(context.Background(), podName, metav1.DeleteOptions{})
+		framework.ExpectNoError(err, "should delete ovnkube-node pod")
+	}
+	//deletePodsFromNamespace := func(f *framework.Framework, namespace string, podNames []string) {
+	//	podClient := f.ClientSet.CoreV1().Pods(namespace)
+	//	for _,podName := range(podNames){
+	//		err := podClient.Delete(context.Background(), podName, metav1.DeleteOptions{})
+	//		framework.ExpectNoError(err, "should delete ovnkube-node pod")
+	//	}
+	//}
+	singlePodConnectivityTest := func(f *framework.Framework, podName string) {
+		framework.Logf("Running container which tries to connect to API server in a loop")
+		podChan, errChan := make(chan *v1.Pod), make(chan error)
+
+		go checkContinuousConnectivity(f, "", podName, getApiAddress(), 443, 30, podChan, errChan)
+		testPod := <-podChan
+
+		framework.Logf("Test pod running on %q", testPod.Spec.NodeName)
+		framework.ExpectNoError(<-errChan)
+	}
+
+	ginkgo.It("delete all db pods at once",func(){
+
+		podList,err := e2epod.GetPods(f.ClientSet,"ovn-kubernetes",map[string]string{"name":databasePodPrefix})
+		if err != nil{
+			framework.Failf("Error: Failed to get pods, err: %v",err)
+		}
+		if len(podList)==0{
+			framework.Failf("Error: db pods not found")
+		}
+
+		framework.Logf("test simple connectivity from new pod to API server,before deleting db pods")
+		singlePodConnectivityTest(f, "before-delete-db-pods")
+
+		framework.Logf("deleting db pods")
+		for _,pod := range(podList){
+			podName := pod.Name
+			framework.Logf("deleting db pod: %v",podName)
+			deletePodFromNamespace(f,ovnNs,podName)
+		}
+		time.Sleep(waitingPeriod)
+
+		framework.Logf("test simple connectivity from new pod to API server,after recovery")
+		singlePodConnectivityTest(f, "after-delete-db-pods")
+	})
+})
