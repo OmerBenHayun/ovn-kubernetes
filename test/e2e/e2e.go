@@ -34,6 +34,12 @@ const (
 	retryTimeout         = 40 * time.Second // polling timeout
 	ciNetworkName        = "kind"
 	agnhostImage         = "k8s.gcr.io/e2e-test-images/agnhost:2.26"
+
+	externalContainerImage2 = "quay.io/ellerbrock/tcpdump:latest"
+	//tcpdumpImage         = "itsthenetwork/alpine-tcpdump"
+	//tcpdumpImage         = "lmnzr/simplebackend:latest"
+	//externalContainerImage = "quay.io/fpaoline/ovnkbfdtest:0.2"
+	//docker.io/rancher/local-path-provisioner:v0.0.14
 )
 
 func checkContinuousConnectivity(f *framework.Framework, nodeName, podName, host string, port, timeout int, podChan chan *v1.Pod, errChan chan error) {
@@ -234,6 +240,10 @@ func createGenericPod(f *framework.Framework, podName, nodeSelector, namespace s
 	return createPod(f, podName, nodeSelector, namespace, command, nil)
 }
 
+func createGenericPod2(f *framework.Framework, podName, nodeSelector, namespace string, command []string) (*v1.Pod, error) {
+	return createPod2(f, podName, nodeSelector, namespace, command, nil)
+}
+
 // Create a pod on the specified node using the agnostic host image
 func createGenericPodWithLabel(f *framework.Framework, podName, nodeSelector, namespace string, command []string, labels map[string]string) (*v1.Pod, error) {
 	return createPod(f, podName, nodeSelector, namespace, command, labels)
@@ -296,6 +306,59 @@ func createPod(f *framework.Framework, podName, nodeSelector, namespace string, 
 				{
 					Name:    contName,
 					Image:   agnhostImage,
+					Command: command,
+				},
+			},
+			NodeName:      nodeSelector,
+			RestartPolicy: v1.RestartPolicyNever,
+		},
+	}
+
+	for _, o := range options {
+		o(pod)
+	}
+
+	podClient := f.ClientSet.CoreV1().Pods(namespace)
+	res, err := podClient.Create(context.Background(), pod, metav1.CreateOptions{})
+	if err != nil {
+		framework.Logf("Warning: Failed to create pod %s %v", pod.Name, err)
+		return nil, errors.Wrapf(err, "Failed to create pod %s %s", pod.Name, namespace)
+	}
+
+	err = e2epod.WaitForPodRunningInNamespace(f.ClientSet, res)
+
+	if err != nil {
+		logs, logErr := e2epod.GetPodLogs(f.ClientSet, namespace, pod.Name, contName)
+		if logErr != nil {
+			framework.Logf("Warning: Failed to get logs from pod %q: %v", pod.Name, logErr)
+		} else {
+			framework.Logf("pod %s/%s logs:\n%s", namespace, pod.Name, logs)
+		}
+	}
+	// Need to get it again to ensure the ip addresses are filled
+	res, err = podClient.Get(context.Background(), pod.Name, metav1.GetOptions{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to get pod %s %s", pod.Name, namespace)
+	}
+	return res, nil
+}
+
+// Create a pod on the specified node using the agnostic host image
+func createPod2(f *framework.Framework, podName, nodeSelector, namespace string, command []string, labels map[string]string, options ...func(*v1.Pod)) (*v1.Pod, error) {
+
+	contName := fmt.Sprintf("%s-container", podName)
+
+	pod := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:   podName,
+			Labels: labels,
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name:    contName,
+					//Image:   agnhostImage,
+					Image:   externalContainerImage2,
 					Command: command,
 				},
 			},
@@ -1521,8 +1584,8 @@ var _ = ginkgo.Describe("e2e multicast IGMP query", func() {
 
 
 	ginkgo.It("omerIGMP", func() {
-		//command        := []string{"bash", "-c", "sleep 20000"}
-		command        := []string{"bash", "-c", "sleep 1"}
+		command        := []string{"bash", "-c", "sleep 2000000"}
+		//command        := []string{"bash", "-c", "sleep 1"}
 		createGenericPod(f, "omerPod", "ovn-worker", f.Namespace.Name, command)
 	})
 
@@ -1548,9 +1611,23 @@ var _ = ginkgo.Describe("e2e IGMP2", func() {
 		var (
 			command = []string{"/agnhost", "netexec", fmt.Sprintf("--http-port=" + port)}
 		)
+		/*
 		framework.Logf("start to create pod")
-		createGenericPod(f, podName, nodeName, f.Namespace.Name, command)
+		createGenericPod2(f, podName, nodeName, f.Namespace.Name, command)
+		time.Sleep(100 * time.Second)
+
 		framework.Logf("done to create pod")
+		framework.Logf("done to create pod")
+		*/
+		framework.Logf("create pod2")
+		//a,b := createClusterExternalContainer(podName, externalContainerImage2, []string{"-itd", "--privileged", "--network", ciNetworkName}, []string{})
+		createGenericPod2(f, podName, nodeName, f.Namespace.Name, command)
+		time.Sleep(10000 * time.Second)
+		//a,b := createClusterExternalContainer(podName, externalContainerImage, command, []string{})
+		framework.Logf("done to create pod2")
+		framework.Logf("strings for comp:")
+		//framework.Logf(a)
+		//framework.Logf(b)
 
 	}
 
