@@ -1508,3 +1508,54 @@ func getNodePodCIDR(nodeName string) (string, error) {
 	}
 	return "", fmt.Errorf("could not parse annotation %q", annotation)
 }
+
+// Validate the IGMP by creating a alpine-tcpdump container on the kind networking
+var _ = ginkgo.Describe("e2e multicast IGMP query", func() {
+	const (
+		svcname          string = "igmp-test"
+		podName          string = "igmp-test-pod"
+		//		waitInterval            = 3 * time.Second
+	)
+
+	f := framework.NewDefaultFramework(svcname)
+
+
+	ginkgo.It("omerIGMP", func() {
+		//command        := []string{"bash", "-c", "sleep 20000"}
+		command        := []string{"bash", "-c", "sleep 1"}
+		createGenericPod(f, "omerPod", "ovn-worker", f.Namespace.Name, command)
+	})
+
+})
+
+var _ = ginkgo.Describe("e2e IGMP2", func() {
+	const (
+		svcname                   string        = "igmp-test"
+		ovnNs                     string        = "ovn-kubernetes"
+		//waitingPeriod             time.Duration = 90 * time.Second // polling timeout
+		ovnWorkerNode             string        = "ovn-worker"
+		ovnWorkerNode2            string        = "ovn-worker2"
+	)
+	f := framework.NewDefaultFramework(svcname)
+
+	createPodTmp := func(f *framework.Framework, nodeName string) {
+		const (
+			podName                  string        = "test-pod1"
+			port                      string        = "8080"
+			timeIntervalBetweenChecks time.Duration = 2 * time.Second
+		)
+
+		var (
+			command = []string{"/agnhost", "netexec", fmt.Sprintf("--http-port=" + port)}
+		)
+		framework.Logf("start to create pod")
+		createGenericPod(f, podName, nodeName, f.Namespace.Name, command)
+		framework.Logf("done to create pod")
+
+	}
+
+	ginkgo.It("testOmerLalala",func(){
+		createPodTmp(f, ovnWorkerNode)
+	})
+
+})
